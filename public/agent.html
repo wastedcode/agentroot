@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Detail — AgentRoot</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a24;
+      --border: #2a2a3a;
+      --text: #e8e8f0;
+      --muted: #888899;
+      --accent: #6366f1;
+      --accent2: #818cf8;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --code-bg: #0d0d15;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+    .logo-icon { font-size: 24px; }
+    .logo-text { font-size: 18px; font-weight: 700; }
+    .logo-tagline { font-size: 12px; color: var(--muted); }
+    nav { display: flex; align-items: center; gap: 4px; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+    nav a:hover { color: var(--text); background: var(--surface2); }
+
+    .container { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
+    .back { color: var(--muted); text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; }
+    .back:hover { color: var(--text); }
+
+    .agent-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px; gap: 16px;
+    }
+    h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .domain { font-size: 14px; color: var(--muted); }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+    }
+    .status-badge.active { background: rgba(52,211,153,0.1); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+    .status-badge.pending { background: rgba(251,191,36,0.1); color: var(--yellow); border: 1px solid rgba(251,191,36,0.2); }
+    .status-badge.failed { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .desc { font-size: 15px; color: var(--muted); line-height: 1.6; margin-bottom: 24px; }
+
+    .caps-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .cap { background: var(--surface2); border: 1px solid var(--border); color: var(--accent2); padding: 5px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; text-decoration: none; }
+    .cap:hover { border-color: var(--accent); }
+    .cat-badge { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); color: var(--accent2); padding: 5px 14px; border-radius: 20px; font-size: 13px; text-decoration: none; }
+
+    .details {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 24px;
+    }
+    .detail-row {
+      display: flex; padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px; gap: 16px;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: var(--muted); min-width: 120px; flex-shrink: 0; }
+    .detail-value { color: var(--text); word-break: break-all; }
+    .detail-value a { color: var(--accent2); text-decoration: none; }
+    .detail-value a:hover { text-decoration: underline; }
+
+    .raw-record {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px;
+      font-family: monospace; font-size: 12px; color: var(--accent2);
+      word-break: break-all; white-space: pre-wrap; margin-bottom: 24px;
+    }
+
+    .section-heading {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      margin: 32px 0 12px;
+    }
+
+    /* ── Calling This Agent section ── */
+    .call-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 24px;
+    }
+    .call-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .call-header h3 { font-size: 15px; font-weight: 700; }
+    .proto-badge {
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px;
+      background: rgba(99,102,241,0.1); color: var(--accent2); border: 1px solid rgba(99,102,241,0.2);
+    }
+    .call-body { padding: 20px; }
+    .call-body p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .call-body p a { color: var(--accent2); text-decoration: none; }
+    .call-body p a:hover { text-decoration: underline; }
+    .a2a-note {
+      background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);
+      border-radius: 8px; padding: 12px 16px;
+      font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6;
+    }
+    .a2a-note a { color: var(--accent2); text-decoration: none; }
+
+    .tab-bar { display: flex; gap: 2px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+    .tab { padding: 6px 16px; font-size: 12px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
+    .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .code-block {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px 16px; font-family: 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12px; color: var(--accent2); overflow-x: auto;
+      line-height: 1.7; white-space: pre; position: relative;
+    }
+    .code-comment { color: var(--muted); }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--muted); padding: 3px 10px; border-radius: 5px;
+      font-size: 11px; cursor: pointer;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--text); }
+    .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+    /* ── Badge embed ── */
+    .badge-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; margin-bottom: 24px;
+    }
+    .badge-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-size: 11px; }
+    .badge-row { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+
+    .verify-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); padding: 8px 16px; border-radius: 8px;
+      font-size: 13px; cursor: pointer;
+    }
+    .verify-btn:hover { border-color: var(--accent); color: var(--text); }
+    .verify-result { margin-top: 12px; font-size: 13px; color: var(--muted); }
+
+    .loading { color: var(--muted); padding: 64px; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="/">
+      <span class="logo-icon">🌐</span>
+      <div>
+        <div class="logo-text">AgentRoot</div>
+        <div class="logo-tagline">Agent Registry</div>
+      </div>
+    </a>
+    <nav>
+      <a href="/">Registry</a>
+      <a href="/howitworks.html">How It Works</a>
+      <a href="/api.html">API Docs</a>
+      <a href="/spec.html">Spec</a>
+      <a href="/submit.html">Submit</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <a class="back" href="/">← Back to Registry</a>
+    <div id="content"><div class="loading">Loading...</div></div>
+  </div>
+
+  <script>
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function fmt(dt) {
+      if (!dt) return '—';
+      return new Date(dt).toLocaleString();
+    }
+
+    const domain = new URLSearchParams(location.search).get('domain');
+    if (!domain) {
+      document.getElementById('content').innerHTML = '<div class="loading">No domain specified.</div>';
+    } else {
+      document.title = `${domain} — AgentRoot`;
+      fetch(`/api/agents/${encodeURIComponent(domain)}`)
+        .then(r => r.json())
+        .then(({ agent, error }) => {
+          if (error || !agent) {
+            document.getElementById('content').innerHTML = `<div class="loading">Agent not found: ${esc(domain)}</div>`;
+            return;
+          }
+          renderAgent(agent);
+        });
+    }
+
+    function buildCallSection(agent) {
+      const hasEndpoint = !!agent.endpoint;
+      const proto = (agent.protocol || 'a2a').toLowerCase();
+      const isA2A = proto === 'a2a';
+
+      if (!hasEndpoint) {
+        return `
+          <div class="call-section">
+            <div class="call-header"><h3>Calling this agent</h3></div>
+            <div class="call-body">
+              <p style="color:var(--muted);text-align:center;padding:16px 0">
+                This agent hasn't published an endpoint yet. <br>
+                <span style="font-size:12px">Once they add an <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;font-family:monospace">endpoint=</code> to their DNS record, invocation details will appear here.</span>
+              </p>
+            </div>
+          </div>`;
+      }
+
+      const endpoint = esc(agent.endpoint);
+      const endpointRaw = agent.endpoint;
+
+      let curlExample, jsExample;
+
+      if (isA2A) {
+        curlExample = `curl -X POST ${endpointRaw} \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "id": "task-001",
+    "skill": "your_skill",
+    "input": {
+      "query": "your query here"
+    }
+  }'`;
+
+        jsExample = `const response = await fetch('${endpointRaw}', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    id: 'task-001',
+    skill: 'your_skill',
+    input: { query: 'your query here' }
+  })
+});
+const result = await response.json();
+// result.status === 'completed'
+// result.output contains the response`;
+      } else {
+        curlExample = `# Generic HTTP request to ${endpointRaw}
+curl -X POST ${endpointRaw} \\
+  -H "Content-Type: application/json" \\
+  -d '{"query": "your request here"}'`;
+
+        jsExample = `const response = await fetch('${endpointRaw}', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ query: 'your request here' })
+});
+const result = await response.json();`;
+      }
+
+      const a2aNote = isA2A ? `
+        <div class="a2a-note">
+          A2A (Agent-to-Agent) is an open protocol for agent interoperability. Send a task object with an <code style="font-family:monospace">id</code>, <code style="font-family:monospace">skill</code>, and <code style="font-family:monospace">input</code> — the agent responds with a <code style="font-family:monospace">status</code> and <code style="font-family:monospace">output</code>. 
+          Check the agent's card URL for supported skills.
+          <a href="https://google.github.io/A2A/" target="_blank" rel="noopener">→ A2A spec</a>
+        </div>` : '';
+
+      return `
+        <div class="call-section">
+          <div class="call-header">
+            <h3>Calling this agent</h3>
+            <span class="proto-badge">${esc(proto.toUpperCase())}</span>
+          </div>
+          <div class="call-body">
+            ${a2aNote}
+            <div class="tab-bar">
+              <div class="tab active" onclick="switchTab(this,'curl')">curl</div>
+              <div class="tab" onclick="switchTab(this,'js')">JavaScript</div>
+            </div>
+            <div class="tab-content active" id="tab-curl">
+              <div class="code-block" id="curl-code">${esc(curlExample)}<button class="copy-btn" onclick="copyCode('curl-code',this)">Copy</button></div>
+            </div>
+            <div class="tab-content" id="tab-js">
+              <div class="code-block" id="js-code">${esc(jsExample)}<button class="copy-btn" onclick="copyCode('js-code',this)">Copy</button></div>
+            </div>
+            ${agent.card_url ? `<p style="margin-top:12px">→ <a href="${endpoint}" target="_blank" rel="noopener">Agent Card / Capabilities</a></p>` : ''}
+          </div>
+        </div>`;
+    }
+
+    function renderAgent(agent) {
+      const caps = (agent.capabilities || '').split(',').filter(Boolean);
+      document.title = `${agent.name || agent.domain} — AgentRoot`;
+      const canonicalUrl = `https://agentroot.io/agents/${agent.domain}`;
+      
+      document.getElementById('content').innerHTML = `
+        <div class="agent-header">
+          <div>
+            <h1>${esc(agent.name || agent.domain)}</h1>
+            <div class="domain">${esc(agent.domain)}</div>
+          </div>
+          <div class="status-badge ${esc(agent.status)}">
+            <span class="dot"></span>${esc(agent.status)}
+          </div>
+        </div>
+        ${agent.description ? `<p class="desc">${esc(agent.description)}</p>` : ''}
+        ${caps.length || agent.category ? `
+          <div class="caps-list">
+            ${caps.map(c => `<a href="/?caps=${encodeURIComponent(c.trim())}" class="cap">${esc(c.trim())}</a>`).join('')}
+            ${agent.category ? `<a href="/categories.html?category=${encodeURIComponent(agent.category)}" class="cat-badge">📂 ${esc(agent.category)}</a>` : ''}
+          </div>` : ''}
+        
+        <div class="details">
+          ${agent.endpoint ? `<div class="detail-row"><span class="detail-label">Endpoint</span><span class="detail-value"><a href="${esc(agent.endpoint)}" target="_blank" rel="noopener">${esc(agent.endpoint)}</a></span></div>` : ''}
+          <div class="detail-row"><span class="detail-label">Protocol</span><span class="detail-value">${esc(agent.protocol || 'a2a')}</span></div>
+          ${agent.card_url ? `<div class="detail-row"><span class="detail-label">Agent Card</span><span class="detail-value"><a href="${esc(agent.card_url)}" target="_blank" rel="noopener">${esc(agent.card_url)}</a></span></div>` : ''}
+          <div class="detail-row"><span class="detail-label">Source</span><span class="detail-value">${esc(agent.source || 'submission')}</span></div>
+          <div class="detail-row"><span class="detail-label">First verified</span><span class="detail-value">${fmt(agent.first_verified)}</span></div>
+          <div class="detail-row"><span class="detail-label">Last verified</span><span class="detail-value">${fmt(agent.last_verified)}</span></div>
+          <div class="detail-row"><span class="detail-label">Last checked</span><span class="detail-value">${fmt(agent.last_checked)}</span></div>
+          <div class="detail-row"><span class="detail-label">Submitted</span><span class="detail-value">${fmt(agent.submitted_at)}</span></div>
+        </div>
+        
+        ${agent.raw_record ? `
+          <h3 class="section-heading">Raw TXT Record</h3>
+          <div class="raw-record">${esc(agent.raw_record)}</div>
+        ` : ''}
+
+        ${buildCallSection(agent)}
+
+        <div class="badge-section">
+          <h3>Listed on AgentRoot Badge</h3>
+          <div class="badge-row">
+            <img src="/api/agents/${esc(agent.domain)}/badge" alt="Listed on AgentRoot" style="height:20px">
+          </div>
+          <div class="code-block" style="font-size:11px;white-space:pre-wrap">${esc(`<!-- HTML -->
+<a href="${canonicalUrl}">
+  <img src="https://agentroot.io/api/agents/${agent.domain}/badge" alt="Listed on AgentRoot">
+</a>
+
+<!-- Markdown -->
+[![Listed on AgentRoot](https://agentroot.io/api/agents/${agent.domain}/badge)](${canonicalUrl})`)}</div>
+        </div>
+        
+        <button class="verify-btn" id="verify-btn" onclick="reVerify('${esc(agent.domain)}')">↻ Re-verify DNS</button>
+        <div class="verify-result" id="verify-result"></div>
+      `;
+    }
+
+    function switchTab(el, id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      const tc = document.getElementById('tab-' + id);
+      if (tc) tc.classList.add('active');
+    }
+
+    function copyCode(id, btn) {
+      const el = document.getElementById(id);
+      // Get text without the button text
+      const text = el.textContent.replace(/Copy$|Copied!$/, '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        btn.className = 'copy-btn copied';
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.className = 'copy-btn';
+        }, 2000);
+      });
+    }
+
+    async function reVerify(domain) {
+      const btn = document.getElementById('verify-btn');
+      const result = document.getElementById('verify-result');
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+      result.textContent = '';
+      try {
+        const r = await fetch(`/api/agents/${encodeURIComponent(domain)}/verify`).then(r => r.json());
+        if (r.success) {
+          result.style.color = 'var(--green)';
+          result.textContent = '✓ Verified — record found and updated';
+        } else {
+          result.style.color = 'var(--yellow)';
+          result.textContent = '⚠ DNS record not found';
+        }
+      } catch (e) {
+        result.style.color = 'var(--red)';
+        result.textContent = 'Error: ' + e.message;
+      }
+      btn.disabled = false;
+      btn.textContent = '↻ Re-verify DNS';
+    }
+  </script>
+</body>
+</html>

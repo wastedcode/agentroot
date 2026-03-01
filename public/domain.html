@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain — AgentRoot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a24;
+      --border: #2a2a3a; --text: #e8e8f0; --muted: #888899;
+      --accent: #0ea5e9; --accent-dim: rgba(14,165,233,0.1); --accent-border: rgba(14,165,233,0.25);
+      --green: #34d399; --green-dim: rgba(52,211,153,0.1); --green-border: rgba(52,211,153,0.25);
+      --indigo: #818cf8;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    header { position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .logo-mark { width: 30px; height: 30px; background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 7px; display: flex; align-items: center; justify-content: center; }
+    .logo-mark svg { width: 16px; height: 16px; fill: none; stroke: white; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+    nav { display: flex; gap: 4px; align-items: center; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500; padding: 6px 12px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
+    nav a:hover { color: var(--text); background: var(--surface2); }
+    .nav-cta { background: var(--accent); color: white !important; margin-left: 8px; padding: 6px 14px !important; border-radius: 6px; font-weight: 600 !important; }
+    .nav-cta:hover { background: #0284c7 !important; }
+
+    .page { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+
+    .hero { padding: 64px 0 48px; }
+    .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .hero h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 800; letter-spacing: -2px; line-height: 1.1; color: var(--text); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; }
+    .hero-domain { color: var(--accent); }
+    .hero-meta { font-size: 15px; color: var(--muted); }
+
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin: 32px 0 0; }
+    .tab { padding: 12px 20px; font-size: 14px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+    .tab-content { padding: 32px 0; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; text-decoration: none; color: var(--text); display: block; transition: border-color 0.2s, transform 0.2s; }
+    .card:hover { border-color: var(--accent-border); transform: translateY(-2px); }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .card-name { font-weight: 700; font-size: 15px; }
+    .card-domain { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+    .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; min-height: 38px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+    .tag-proto { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px rgba(52,211,153,0.5); flex-shrink: 0; margin-top: 6px; }
+
+    .section-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+    .section-title span { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+
+    .empty { text-align: center; padding: 60px; color: var(--muted); }
+    .empty p { margin-bottom: 12px; }
+    .empty a { color: var(--accent); text-decoration: none; }
+
+    .loading { text-align: center; padding: 60px; color: var(--muted); }
+
+    footer { border-top: 1px solid var(--border); margin-top: 80px; padding: 24px 32px; }
+    .footer-inner { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .footer-copy { font-size: 13px; color: var(--muted); }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      .page { padding: 0 20px; }
+      .hero { padding: 40px 0 32px; }
+      nav a:not(.nav-cta) { display: none; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="/">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><line x1="12" y1="7.5" x2="5" y2="16.5"/><line x1="12" y1="7.5" x2="19" y2="16.5"/><line x1="5" y1="19" x2="19" y2="19"/></svg>
+      </div>
+      <span class="logo-text">AgentRoot</span>
+    </a>
+    <nav>
+      <a href="/">Registry</a>
+      <a href="/howitworks.html">How It Works</a>
+      <a href="/api.html">API</a>
+      <a href="/spec.html">Spec</a>
+      <a href="/submit.html" class="nav-cta">Submit</a>
+    </nav>
+  </header>
+
+  <div class="page">
+    <div class="hero">
+      <div class="breadcrumb"><a href="/">AgentRoot</a> / <a href="/#domains">Domains</a> / <span id="breadcrumb-domain">…</span></div>
+      <h1>// <span class="hero-domain" id="hero-domain">loading…</span></h1>
+      <div class="hero-meta" id="hero-meta">Loading domain records…</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="all">All</button>
+      <button class="tab" data-tab="agents">Agents <span id="agent-count-tab"></span></button>
+      <button class="tab" data-tab="skills">Skills <span id="skill-count-tab"></span></button>
+    </div>
+
+    <div class="tab-content">
+      <div class="tab-panel active" id="panel-all">
+        <div class="loading" id="loading-all">Loading…</div>
+        <div id="all-grid"></div>
+      </div>
+      <div class="tab-panel" id="panel-agents">
+        <div id="agents-grid"></div>
+      </div>
+      <div class="tab-panel" id="panel-skills">
+        <div id="skills-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-copy">© AgentRoot 2026</div>
+      <div class="footer-links">
+        <a href="/spec.html">Spec</a>
+        <a href="/api.html">API</a>
+        <a href="/submit.html">Submit</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const rootDomain = new URLSearchParams(location.search).get('domain');
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function agentCard(a) {
+      return `<a class="card" href="/agents/${encodeURIComponent(a.domain)}">
+        <div class="card-top">
+          <div>
+            <div class="card-name">${esc(a.name || a.domain)}</div>
+            <div class="card-domain">${esc(a.domain)}</div>
+          </div>
+          <div class="status-dot"></div>
+        </div>
+        <div class="card-desc">${esc(a.description || 'No description.')}</div>
+        <div class="tags">
+          ${(a.capabilities||'').split(',').filter(Boolean).slice(0,3).map(c=>`<span class="tag">${esc(c.trim())}</span>`).join('')}
+          ${a.protocol ? `<span class="tag tag-proto">${esc(a.protocol)}</span>` : ''}
+        </div>
+      </a>`;
+    }
+
+    function skillCard(s) {
+      return `<a class="card" href="/skills/${encodeURIComponent(s.domain)}">
+        <div class="card-top">
+          <div>
+            <div class="card-name">${esc(s.name || s.domain)}</div>
+            <div class="card-domain">${esc(s.domain)}</div>
+          </div>
+          <div class="status-dot" style="background:var(--indigo);box-shadow:0 0 6px rgba(129,140,248,0.5)"></div>
+        </div>
+        <div class="card-desc">${esc(s.description || 'No description.')}</div>
+        <div class="tags">
+          ${(s.capabilities||'').split(',').filter(Boolean).slice(0,3).map(c=>`<span class="tag">${esc(c.trim())}</span>`).join('')}
+          ${s.proto ? `<span class="tag tag-proto">${esc(s.proto)}</span>` : ''}
+          ${s.auth && s.auth !== 'none' ? `<span class="tag">${esc(s.auth)}</span>` : ''}
+          ${s.cost && s.cost !== 'free' ? `<span class="tag">${esc(s.cost)}</span>` : ''}
+        </div>
+      </a>`;
+    }
+
+    async function load() {
+      const domain = rootDomain;
+      if (!domain) {
+        document.getElementById('hero-domain').textContent = 'Unknown domain';
+        document.getElementById('hero-meta').textContent = 'No domain specified.';
+        return;
+      }
+      document.getElementById('breadcrumb-domain').textContent = domain;
+      document.getElementById('hero-domain').textContent = domain;
+      document.title = `${domain} — AgentRoot`;
+
+      try {
+        const data = await fetch(`/api/domains/${encodeURIComponent(domain)}`).then(r => r.json());
+        if (data.error) {
+          document.getElementById('hero-meta').textContent = 'No records found for this domain.';
+          document.getElementById('loading-all').textContent = 'No agents or skills registered under this domain.';
+          return;
+        }
+
+        const { agents, skills, total } = data;
+        document.getElementById('hero-meta').textContent = `${agents.length} agent${agents.length !== 1 ? 's' : ''} · ${skills.length} skill${skills.length !== 1 ? 's' : ''} · ${total} total`;
+        document.getElementById('agent-count-tab').textContent = agents.length ? `(${agents.length})` : '';
+        document.getElementById('skill-count-tab').textContent = skills.length ? `(${skills.length})` : '';
+
+        // All panel
+        document.getElementById('loading-all').style.display = 'none';
+        const allGrid = document.getElementById('all-grid');
+        if (!total) {
+          allGrid.innerHTML = '<div class="empty"><p>No records found.</p><p><a href="/submit.html">Submit a domain →</a></p></div>';
+        } else {
+          if (agents.length) {
+            allGrid.innerHTML += `<div class="section-title">Agents <span>${agents.length}</span></div><div class="grid">${agents.map(agentCard).join('')}</div>`;
+          }
+          if (skills.length) {
+            allGrid.innerHTML += `<div class="section-title" style="margin-top:32px">Skills <span>${skills.length}</span></div><div class="grid">${skills.map(skillCard).join('')}</div>`;
+          }
+        }
+
+        // Agents panel
+        document.getElementById('agents-grid').innerHTML = agents.length
+          ? `<div class="grid">${agents.map(agentCard).join('')}</div>`
+          : '<div class="empty"><p>No agents for this domain.</p></div>';
+
+        // Skills panel
+        document.getElementById('skills-grid').innerHTML = skills.length
+          ? `<div class="grid">${skills.map(skillCard).join('')}</div>`
+          : '<div class="empty"><p>No skills for this domain.</p></div>';
+
+      } catch(e) {
+        document.getElementById('hero-meta').textContent = 'Failed to load domain data.';
+        document.getElementById('loading-all').textContent = 'Error loading data.';
+      }
+    }
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    load();
+  </script>
+</body>
+</html>

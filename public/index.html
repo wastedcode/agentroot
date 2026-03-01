@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentRoot — The DNS for the Agentic Internet</title>
+  <meta name="description" content="AgentRoot is a public, DNS-native registry for AI agents. No gatekeepers. No crawlers. Just DNS.">
+  <meta property="og:title" content="AgentRoot — The DNS for the Agentic Internet">
+  <meta property="og:description" content="Find AI agents by capability. Register yours with a DNS TXT record. Open, decentralized, no gatekeepers.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://agentroot.io/">
+  <meta property="og:site_name" content="AgentRoot">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AgentRoot — The DNS for the Agentic Internet">
+  <meta name="twitter:description" content="Find AI agents by capability. Register yours with a DNS TXT record.">
+  <link rel="canonical" href="https://agentroot.io/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AgentRoot",
+    "url": "https://agentroot.io",
+    "description": "DNS-native public registry for AI agents",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://agentroot.io/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <style>
+    /* ── Variables ── */
+    :root {
+      --bg: #fafaf8;
+      --bg2: #f3f3f0;
+      --surface: #ffffff;
+      --surface2: #f7f7f5;
+      --border: #e2e2dc;
+      --border2: #d4d4cc;
+      --text: #1a1a18;
+      --text2: #3a3a36;
+      --muted: #78786e;
+      --accent: #e36209;
+      --accent-dim: rgba(227,98,9,0.08);
+      --accent-border: rgba(227,98,9,0.25);
+      --accent-dark: #c25206;
+      --green: #1a7f37;
+      --green-bg: #dafbe1;
+      --green-border: #a7f3c0;
+      --blue: #0969da;
+      --blue-bg: #ddf4ff;
+      --blue-border: #80ccff;
+      --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Menlo', monospace;
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header / Nav ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-mark {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      border-radius: 5px;
+      padding: 4px 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    nav a {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      transition: color 0.12s, background 0.12s;
+      white-space: nowrap;
+    }
+
+    nav a:hover { color: var(--text); background: var(--bg2); }
+    nav a.active { color: var(--text); }
+
+    .nav-cta {
+      font-family: var(--mono) !important;
+      font-size: 12px !important;
+      background: var(--accent) !important;
+      color: white !important;
+      margin-left: 10px;
+      padding: 6px 14px !important;
+      border-radius: 5px;
+      font-weight: 600 !important;
+    }
+    .nav-cta:hover { background: var(--accent-dark) !important; }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 56px;
+      left: 0; right: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      z-index: 99;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .mobile-nav a:last-child { border-bottom: none; }
+    .mobile-nav a:hover { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero-section {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 72px 32px 64px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+
+    .hero-left {}
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    .hero-prompt {
+      font-family: var(--mono);
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .hero-prompt .prompt-char {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .hero-prompt .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: var(--accent);
+      vertical-align: text-bottom;
+      margin-left: 3px;
+      animation: cursor-blink 1s step-end infinite;
+    }
+
+    @keyframes cursor-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .hero-desc {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 32px;
+      max-width: 420px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--accent);
+      color: white;
+      padding: 10px 22px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      border: 1px solid var(--accent);
+      transition: background 0.12s;
+    }
+    .btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+
+    .btn-ghost {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      background: transparent;
+      color: var(--text2);
+      padding: 10px 22px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      border: 1px solid var(--border2);
+      transition: border-color 0.12s, color 0.12s, background 0.12s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    /* ── Terminal window ── */
+    .terminal {
+      background: #1a1a18;
+      border-radius: var(--radius-lg);
+      border: 1px solid #333330;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .terminal-bar {
+      background: #2a2a27;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #333330;
+    }
+
+    .term-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .term-dot.red { background: #ff5f57; }
+    .term-dot.yellow { background: #ffbd2e; }
+    .term-dot.green { background: #28c840; }
+
+    .terminal-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #888880;
+      margin-left: 8px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .terminal-body {
+      padding: 20px 22px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.8;
+      color: #c8c8c0;
+      min-height: 220px;
+    }
+
+    .t-prompt { color: #e36209; }
+    .t-cmd { color: #e8e8e0; }
+    .t-comment { color: #666660; }
+    .t-key { color: #7dd3fc; }
+    .t-val { color: #a8ff78; }
+    .t-string { color: #fbbf24; }
+    .t-dim { color: #555550; }
+    .t-success { color: #28c840; }
+    .t-typing::after {
+      content: '▊';
+      color: #e36209;
+      animation: cursor-blink 1s step-end infinite;
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+
+    .stats-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .stat-item {
+      flex: 1;
+      padding: 0 24px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .stat-item:first-child { padding-left: 0; }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-code {
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 18px 0;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .stat-code .s-key { color: var(--blue); }
+    .stat-code .s-eq { color: var(--muted); }
+    .stat-code .s-num { color: var(--accent); font-weight: 700; }
+    .stat-code .s-comment { color: #999990; }
+
+    /* ── Page layout ── */
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 64px 0;
+    }
+
+    .section { margin-bottom: 72px; }
+
+    /* ── Section header as comment ── */
+    .section-comment {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .section h2 {
+      font-size: clamp(24px, 3.5vw, 32px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .section-intro {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 36px;
+      max-width: 620px;
+    }
+
+    /* ── Feature / info grid ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: border-color 0.15s;
+    }
+
+    .feature-card:hover { border-color: var(--border2); }
+
+    .feature-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .feature-card code {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--accent);
+    }
+
+    /* ── Code block ── */
+    .code-block {
+      background: #1a1a18;
+      border: 1px solid #333330;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #c8c8c0;
+      overflow-x: auto;
+      line-height: 1.75;
+      max-width: 100%;
+    }
+
+    .code-block .comment { color: #555550; }
+    .code-block .key { color: #7dd3fc; }
+    .code-block .val { color: #a8ff78; }
+    .code-block .str { color: #fbbf24; }
+    .code-block .prompt { color: #e36209; }
+
+    /* ── Inline code ── */
+    .ic {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    /* ── How it works — steps ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step:last-child { border-bottom: none; }
+
+    .step-num-col {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 0;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--border2);
+      line-height: 1;
+      margin-top: 4px;
+    }
+
+    .step.active .step-num { color: var(--accent); }
+
+    .step-body {
+      padding: 24px 28px;
+      min-width: 0;
+    }
+
+    .step-body h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .step-body p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── Roadmap ── */
+    .roadmap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .rm-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rm-item:last-child { border-bottom: none; }
+
+    .rm-status {
+      padding: 20px 16px;
+      border-right: 1px solid var(--border);
+      background: var(--bg2);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .rm-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .rm-badge.live {
+      color: var(--green);
+      background: var(--green-bg);
+      border-color: var(--green-border);
+    }
+
+    .rm-badge.next {
+      color: var(--blue);
+      background: var(--blue-bg);
+      border-color: var(--blue-border);
+    }
+
+    .rm-badge.future {
+      color: var(--muted);
+      background: var(--bg2);
+      border-color: var(--border2);
+    }
+
+    .rm-body { padding: 20px 24px; }
+
+    .rm-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .rm-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ── Why DNS ── */
+    .manifesto-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .manifesto-left p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+
+    .manifesto-left p strong { color: var(--text2); font-weight: 600; }
+
+    .manifesto-facts { display: flex; flex-direction: column; gap: 16px; }
+
+    .fact {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .fact-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      border-radius: 4px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .fact-body h4 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .fact-body p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Registry section ── */
+    .registry-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .registry-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .search-input {
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 9px 14px 9px 46px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      color: var(--text);
+      outline: none;
+      min-width: 260px;
+      transition: border-color 0.15s;
+    }
+
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--accent); }
+
+    .caps-filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .cap-chip {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      color: var(--muted);
+      padding: 4px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .cap-chip:hover { color: var(--text); border-color: var(--accent); }
+    .cap-chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+    /* ── Agent cards — file style ── */
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      overflow: hidden;
+    }
+
+    .agent-card:hover {
+      border-color: var(--accent-border);
+      box-shadow: 0 2px 12px rgba(227,98,9,0.08);
+    }
+
+    .card-header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-file-icon {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .card-domain-label {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text2);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+    .card-status-dot.pending { background: #d29922; }
+    .card-status-dot.failed { background: #cf222e; }
+
+    .card-body { padding: 16px 16px 14px; }
+
+    .card-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 14px;
+      min-height: 38px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .tag-proto {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+      color: var(--accent);
+    }
+
+    .tag-cat {
+      background: var(--blue-bg);
+      border-color: var(--blue-border);
+      color: var(--blue);
+    }
+
+    .card-date {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--border2);
+      margin-top: 12px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 64px 32px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px dashed var(--border2);
+      border-radius: var(--radius-lg);
+    }
+
+    .empty-state p {
+      font-family: var(--mono);
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state .empty-comment { color: var(--border2); margin-bottom: 8px; }
+
+    .empty-state a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    .empty-state a:hover { text-decoration: underline; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      margin-top: 80px;
+      padding: 28px 32px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-copy {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 16px;
+    }
+
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 48px 24px 40px;
+      }
+      .manifesto-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 0 20px; }
+      nav { display: none; }
+      .hamburger { display: block; }
+
+      .page { padding: 0 20px; }
+
+      .stats-inner { flex-direction: column; padding: 0; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 0 20px; }
+      .stat-item:last-child { border-bottom: none; }
+
+      .feature-grid { grid-template-columns: 1fr; }
+      .agent-grid { grid-template-columns: 1fr; }
+
+      .step { grid-template-columns: 60px 1fr; }
+      .rm-item { grid-template-columns: 80px 1fr; }
+
+      .registry-controls { flex-direction: column; align-items: stretch; }
+      .search-wrap { width: 100%; }
+      .search-input { min-width: 0; width: 100%; }
+
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .divider { margin: 48px 0; }
+      .section { margin-bottom: 56px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-prompt { font-size: 22px; letter-spacing: -0.5px; }
+      .hero-actions { flex-direction: column; }
+      .btn-primary, .btn-ghost { text-align: center; }
+      .rm-item { grid-template-columns: 1fr; }
+      .rm-status { border-right: none; border-bottom: 1px solid var(--border); padding: 12px 20px; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header>
+    <a class="logo" href="/">
+      <span class="logo-mark">$</span>
+      <span class="logo-text">AgentRoot</span>
+    </a>
+    <nav>
+      <a href="/" class="active">$ ls /registry</a>
+      <a href="/howitworks.html">$ man howto</a>
+      <a href="/api.html">$ cat api.md</a>
+      <a href="/spec.html">$ cat spec.txt</a>
+      <a href="/submit.html" class="nav-cta">$ submit --domain</a>
+    </nav>
+    <button class="hamburger" id="hamburger-btn" aria-label="Open menu">☰</button>
+  </header>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="/">$ ls /registry</a>
+    <a href="/howitworks.html">$ man howto</a>
+    <a href="/api.html">$ cat api.md</a>
+    <a href="/spec.html">$ cat spec.txt</a>
+    <a href="/submit.html">$ submit --domain →</a>
+  </div>
+
+  <!-- ── HERO ── -->
+  <div class="hero-section">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Open · DNS-native · No gatekeepers</div>
+        <div class="hero-prompt">
+          <span class="prompt-char">&gt; </span>The open registry<br>for the agentic web<span class="cursor"></span>
+        </div>
+        <p class="hero-desc">
+          Publish one <span class="ic">_agent</span> TXT record on your domain. 
+          AgentRoot finds it via DNS — no scraping, no gatekeepers, no permission required. 
+          The phonebook for the agentic internet.
+        </p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="/submit.html">$ submit --domain</a>
+          <a class="btn-ghost" href="#registry">$ ls /registry</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <!-- Terminal window showing live DNS lookup simulation -->
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="term-dot red"></div>
+            <div class="term-dot yellow"></div>
+            <div class="term-dot green"></div>
+            <div class="terminal-title">bash — 80×24</div>
+          </div>
+          <div class="terminal-body" id="terminal-body">
+            <div><span class="t-prompt">$</span> <span class="t-cmd">dig TXT _agent.agentroot.io +short</span></div>
+            <div class="t-dim">; &lt;&lt;&gt;&gt; DiG 9.18.0 &lt;&lt;&gt;&gt; TXT _agent.agentroot.io</div>
+            <div class="t-dim">; ANSWER SECTION:</div>
+            <div id="term-answer" style="opacity:0;transition:opacity 0.4s">
+              <div><span class="t-val">"v=agent1</span> <span class="t-key">name=</span><span class="t-string">AgentRoot</span></div>
+              <div>&nbsp;<span class="t-key">caps=</span><span class="t-string">agent_discovery,registry_query</span></div>
+              <div>&nbsp;<span class="t-key">proto=</span><span class="t-string">a2a</span></div>
+              <div>&nbsp;<span class="t-key">endpoint=</span><span class="t-string">https://agentroot.io/a2a</span><span class="t-val">"</span></div>
+            </div>
+            <div id="term-result" style="opacity:0;transition:opacity 0.4s">
+              <div>&nbsp;</div>
+              <div><span class="t-prompt">$</span> <span class="t-cmd">curl -s agentroot.io/api/agents | jq '.count'</span></div>
+              <div id="term-count" class="t-success">0 <span class="t-comment"># growing</span></div>
+              <div>&nbsp;</div>
+              <div><span class="t-prompt">$</span> <span class="t-typing"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STATS BAR ── -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-code">
+          <span class="s-key">const</span> <span class="s-eq"> agents </span><span class="s-eq">=</span> <span class="s-num" id="stat-active">0</span><span class="s-comment">; // active</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-code">
+          <span class="s-key">const</span> <span class="s-eq"> skills </span><span class="s-eq">=</span> <span class="s-num" id="stat-skills">0</span><span class="s-comment">; // indexed</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-code">
+          <span class="s-key">const</span> <span class="s-eq"> pending </span><span class="s-eq">=</span> <span class="s-num" id="stat-pending">0</span><span class="s-comment">; // verifying</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-code">
+          <span class="s-key">const</span> <span class="s-eq"> tlds </span><span class="s-eq">=</span> <span class="s-num" id="stat-tlds">0</span><span class="s-comment">; // covered</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="page">
+
+    <hr class="divider">
+
+    <!-- ── WHY DNS ── -->
+    <div class="section">
+      <div class="section-comment">// why_dns.md</div>
+      <h2>The phonebook is already built.</h2>
+      <p class="section-intro">
+        DNS is the internet's original open directory. It's been running for 40 years.
+        We're using it to make agents findable — without any central authority.
+      </p>
+      <div class="manifesto-grid">
+        <div class="manifesto-left">
+          <p>
+            Agents are proliferating — MCP servers, A2A endpoints, OpenAPI services.
+            But without a way to discover each other, <strong>they're invisible to each other.</strong>
+            There's no registry. No index. No way to ask: "what agents exist that can do X?"
+          </p>
+          <p>
+            AgentRoot fixes the cold-start problem for the agentic internet. Publish an
+            <span class="ic">_agent</span> TXT record on your domain. That's your declaration of existence.
+            We read zone files — no scraping, no rate limits, no permission needed.
+          </p>
+          <div class="code-block" style="margin-top:20px"><span class="prompt">$</span> dig TXT _agent.example.com +short
+<span class="val">"v=agent1 name=MyAgent</span>
+ <span class="key">caps=</span><span class="str">search,summarize</span>
+ <span class="key">endpoint=</span><span class="str">https://example.com/agent</span>
+ <span class="key">proto=</span><span class="str">mcp</span><span class="val">"</span></div>
+        </div>
+        <div class="manifesto-facts">
+          <div class="fact">
+            <div class="fact-num">01</div>
+            <div class="fact-body">
+              <h4>Zone files are public</h4>
+              <p>ICANN publishes zone files for every generic TLD. Anyone can read them — no scraping, no rate limits, no permission.</p>
+            </div>
+          </div>
+          <div class="fact">
+            <div class="fact-num">02</div>
+            <div class="fact-body">
+              <h4>No single company controls this</h4>
+              <p>DNS is the internet's original open directory. No one owns it. Any node can index it. Discoverability is a public good.</p>
+            </div>
+          </div>
+          <div class="fact">
+            <div class="fact-num">03</div>
+            <div class="fact-body">
+              <h4>Protocol agnostic</h4>
+              <p>Declare MCP, A2A, OpenAPI, REST — whatever you use. We index the declaration, not the protocol. You choose.</p>
+            </div>
+          </div>
+          <div class="fact">
+            <div class="fact-num">04</div>
+            <div class="fact-body">
+              <h4>Open by default</h4>
+              <p>The registry is public. No API keys needed to query it. No gatekeepers. Anyone can run their own node.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── HOW IT WORKS ── -->
+    <div class="section">
+      <div class="section-comment">// how_it_works.md</div>
+      <h2>Three steps to being found.</h2>
+      <p class="section-intro">No signup. No API keys. No centralized control. Just DNS the way it was meant to work.</p>
+      <div class="steps">
+        <div class="step active">
+          <div class="step-num-col"><div class="step-num">01</div></div>
+          <div class="step-body">
+            <h3>Publish your <span class="ic">_agent</span> TXT record</h3>
+            <p>Go to your DNS provider and add a TXT record at <span class="ic">_agent.yourdomain.com</span>. Declare your name, capabilities, endpoint, and protocol. That's your identity on the agentic internet.</p>
+          </div>
+        </div>
+        <div class="step active">
+          <div class="step-num-col"><div class="step-num">02</div></div>
+          <div class="step-body">
+            <h3>Submit your domain</h3>
+            <p>Tell AgentRoot your domain exists. We do a live DNS lookup, verify your record is valid, and add you to the public registry immediately. No manual review, no waiting period.</p>
+          </div>
+        </div>
+        <div class="step active">
+          <div class="step-num-col"><div class="step-num">03</div></div>
+          <div class="step-body">
+            <h3>Get discovered</h3>
+            <p>Your agent appears in the searchable registry. Other agents and developers query the API by capability. AgentRoot re-verifies every 6 hours — your DNS record is the source of truth.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── PROTOCOL AGNOSTIC ── -->
+    <div class="section">
+      <div class="section-comment">// protocols.md</div>
+      <h2>You choose the protocol.</h2>
+      <p class="section-intro">AgentRoot doesn't enforce a protocol. Declare whatever you use — we index it, not prescribe it.</p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-label">proto=mcp</div>
+          <h3>MCP</h3>
+          <p>Model Context Protocol — expose tools and resources to LLM clients. Widely supported by Claude, Cursor, and others.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-label">proto=a2a</div>
+          <h3>A2A</h3>
+          <p>Agent2Agent — Google's open standard for agent-to-agent communication and capability negotiation.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-label">proto=openapi</div>
+          <h3>OpenAPI / REST</h3>
+          <p>Standard HTTP APIs with an OpenAPI spec. Point to your schema URL via the <code>card=</code> field.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-label">proto=*</div>
+          <h3>Anything else</h3>
+          <p>GraphQL, gRPC, custom protocols. Set <code>proto=</code> to whatever string makes sense. The registry is a directory.</p>
+        </div>
+      </div>
+      <div class="code-block"><span class="comment"># Each agent declares its own protocol — mix freely</span>
+<span class="key">_agent.mcp-server.example.com</span>  TXT  <span class="str">"v=agent1 name=DataBot caps=query,transform proto=mcp endpoint=https://..."</span>
+<span class="key">_agent.api.example.com        </span>  TXT  <span class="str">"v=agent1 name=APIBot caps=search proto=openapi endpoint=https://..."</span>
+<span class="key">_agent.chat.example.com       </span>  TXT  <span class="str">"v=agent1 name=ChatBot caps=chat,reason proto=a2a endpoint=https://..."</span></div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── ROADMAP ── -->
+    <div class="section">
+      <div class="section-comment">// roadmap.md</div>
+      <h2>Where this is going.</h2>
+      <p class="section-intro">Building the infrastructure layer for a discoverable, interoperable agentic internet. Openly.</p>
+      <div class="roadmap">
+        <div class="rm-item">
+          <div class="rm-status"><span class="rm-badge live">live</span></div>
+          <div class="rm-body">
+            <div class="rm-title">v1 — Submit → Verify → Discover</div>
+            <div class="rm-desc">Submit your domain. We verify the <span class="ic">_agent</span> TXT record via live DNS. You appear in the public registry immediately. The foundation works.</div>
+          </div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-status"><span class="rm-badge next">next</span></div>
+          <div class="rm-body">
+            <div class="rm-title">v2 — Zone file auto-ingestion</div>
+            <div class="rm-desc">AgentRoot will ingest ICANN zone files automatically and discover agents without any submission. Publish the record — you're found.</div>
+          </div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-status"><span class="rm-badge future">v3</span></div>
+          <div class="rm-body">
+            <div class="rm-title">Semantic search</div>
+            <div class="rm-desc">Find agents by what they do, not just their name. "Find me an agent that summarizes earnings calls and posts to Slack."</div>
+          </div>
+        </div>
+        <div class="rm-item">
+          <div class="rm-status"><span class="rm-badge future">v4</span></div>
+          <div class="rm-body">
+            <div class="rm-title">Decentralized nodes</div>
+            <div class="rm-desc">Anyone can run their own AgentRoot node. The registry becomes a network, not a single point of control.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- ── REGISTRY ── -->
+    <div class="section" id="registry">
+      <div class="section-comment">// registry — live index</div>
+      <div class="registry-header">
+        <h2>Agent registry.</h2>
+        <div class="registry-controls">
+          <div class="search-wrap">
+            <span class="search-prefix">$ grep</span>
+            <input class="search-input" type="text" id="search" placeholder="name, capability, domain…" />
+          </div>
+        </div>
+      </div>
+
+      <div class="caps-filters" id="caps-filters"></div>
+
+      <div class="agent-grid" id="agent-grid">
+        <div class="empty-state">
+          <p class="empty-comment">// no results yet</p>
+          <p>Loading registry…</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-copy">© AgentRoot 2026 · <span style="color:var(--border2)">// built by Inder</span></div>
+      <div class="footer-links">
+        <a href="/spec.html">spec.txt</a>
+        <a href="/api.html">api.md</a>
+        <a href="/howitworks.html">howto.md</a>
+        <a href="/submit.html">submit --domain</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Terminal animation ──
+    setTimeout(() => {
+      const ans = document.getElementById('term-answer');
+      if (ans) ans.style.opacity = '1';
+    }, 900);
+    setTimeout(() => {
+      const res = document.getElementById('term-result');
+      if (res) res.style.opacity = '1';
+    }, 1800);
+
+    // ── Stats ──
+    async function loadStats() {
+      try {
+        const r = await fetch('/api/stats').then(r => r.json());
+        document.getElementById('stat-active').textContent = r.active ?? 0;
+        document.getElementById('stat-pending').textContent = r.pending ?? 0;
+        document.getElementById('stat-skills').textContent = r.skills?.active ?? 0;
+        const tldCount = r.byTld ? Object.keys(r.byTld).length : 0;
+        document.getElementById('stat-tlds').textContent = tldCount || 0;
+        // Update terminal count
+        const termCount = document.getElementById('term-count');
+        if (termCount) {
+          termCount.innerHTML = `<span class="t-success">${r.active ?? 0}</span> <span class="t-comment">// growing</span>`;
+        }
+      } catch(e) {}
+    }
+
+    // ── Agents ──
+    let activeCapFilter = null;
+    let searchTimeout = null;
+
+    async function loadAgents(q = '', caps = '') {
+      let url = '/api/agents';
+      const params = new URLSearchParams();
+      if (q) params.set('q', q);
+      if (caps) params.set('caps', caps);
+      if ([...params].length) url += '?' + params;
+      try {
+        const r = await fetch(url).then(r => r.json());
+        const agents = r.agents || [];
+        renderAgents(agents);
+        buildCapFilters(agents);
+      } catch(e) {
+        document.getElementById('agent-grid').innerHTML = '<div class="empty-state"><p class="empty-comment">// error</p><p>Could not load registry.</p></div>';
+      }
+    }
+
+    function buildCapFilters(agents) {
+      const capSet = new Set();
+      agents.forEach(a => {
+        if (a.capabilities) a.capabilities.split(',').forEach(c => { const t = c.trim(); if (t) capSet.add(t); });
+      });
+      const container = document.getElementById('caps-filters');
+      container.innerHTML = '';
+      [...capSet].slice(0, 14).forEach(cap => {
+        const chip = document.createElement('button');
+        chip.className = 'cap-chip' + (activeCapFilter === cap ? ' active' : '');
+        chip.textContent = cap;
+        chip.onclick = () => {
+          activeCapFilter = activeCapFilter === cap ? null : cap;
+          loadAgents(document.getElementById('search').value, activeCapFilter || '');
+        };
+        container.appendChild(chip);
+      });
+    }
+
+    function formatDate(str) {
+      if (!str) return '';
+      const d = new Date(str);
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderAgents(agents) {
+      const grid = document.getElementById('agent-grid');
+      if (!agents.length) {
+        grid.innerHTML = `<div class="empty-state">
+          <p class="empty-comment">// registry is empty — be the first</p>
+          <p>No agents indexed yet. <a href="/submit.html">Register yours →</a></p>
+        </div>`;
+        return;
+      }
+      grid.innerHTML = agents.map(a => `
+        <a class="agent-card" href="/agents/${encodeURIComponent(a.domain)}">
+          <div class="card-header">
+            <span class="card-file-icon">📄</span>
+            <span class="card-domain-label">${esc(a.domain)}</span>
+            <div class="card-status-dot ${a.status}"></div>
+          </div>
+          <div class="card-body">
+            <div class="card-name">${esc(a.name || a.domain)}</div>
+            <div class="card-desc">${esc(a.description || 'No description provided.')}</div>
+            <div class="card-tags">
+              ${(a.capabilities || '').split(',').filter(Boolean).slice(0,4).map(c => `<span class="tag">${esc(c.trim())}</span>`).join('')}
+              ${a.protocol ? `<span class="tag tag-proto">${esc(a.protocol)}</span>` : ''}
+              ${a.category ? `<span class="tag tag-cat">${esc(a.category)}</span>` : ''}
+            </div>
+            ${a.first_verified ? `<div class="card-date">// listed ${formatDate(a.first_verified)}</div>` : ''}
+          </div>
+        </a>
+      `).join('');
+    }
+
+    document.getElementById('search').addEventListener('input', e => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => loadAgents(e.target.value, activeCapFilter || ''), 300);
+    });
+
+    const urlQ = new URLSearchParams(location.search).get('q');
+    if (urlQ) {
+      document.getElementById('search').value = urlQ;
+      loadAgents(urlQ);
+    } else {
+      loadAgents();
+    }
+    loadStats();
+
+    // ── Hamburger ──
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileNav = document.getElementById('mobile-nav');
+
+    function checkMobileNav() {
+      const isMobile = window.innerWidth < 768;
+      if (hamburgerBtn) hamburgerBtn.style.display = isMobile ? 'block' : 'none';
+    }
+
+    if (hamburgerBtn) {
+      hamburgerBtn.addEventListener('click', () => {
+        mobileNav.classList.toggle('open');
+        hamburgerBtn.textContent = mobileNav.classList.contains('open') ? '✕' : '☰';
+      });
+    }
+
+    checkMobileNav();
+    window.addEventListener('resize', checkMobileNav);
+  </script>
+</body>
+</html>

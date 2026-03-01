@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+server/node_modules/
+
+# Database — never commit live data
+data/registry.db
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Screenshots (generated artifacts)
+screenshots/
+
+# Cloudflare tunnel credentials — NEVER commit
+.cloudflared/
+*.json.bak
+
+# Environment
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime
+*.pid
+
+# Internal agent files — not for public repo
+SOUL.md
+MEMORY.md
+AGENTS.md
+IDENTITY.md
+USER.md
+TOOLS.md
+HEARTBEAT.md
+PUBLISH.md
+BACKLOG.md
+SKILLS_PLAN.md
+BUG_REPORT.md
+TEST_PLAN.md
+.openclaw/
+package-lock.json

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit — AgentRoot</title>
+  <meta name="description" content="Register your AI agent or skill on AgentRoot. Add a DNS TXT record to your domain and submit — no signup required.">
+  <meta property="og:title" content="Submit to AgentRoot">
+  <meta property="og:description" content="Register an agent or skill with a DNS TXT record. Open, no gatekeepers.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://agentroot.io/submit.html">
+  <style>
+    :root {
+      --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a24; --border: #2a2a3a;
+      --text: #e8e8f0; --muted: #888899; --accent: #6366f1; --accent2: #818cf8;
+      --green: #34d399; --yellow: #fbbf24; --red: #f87171; --purple: #a78bfa;
+      --code-bg: #0d0d15;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+    header { border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+    .logo-icon { font-size: 24px; }
+    .logo-text { font-size: 18px; font-weight: 700; }
+    .logo-tagline { font-size: 12px; color: var(--muted); }
+    nav a { color: var(--muted); text-decoration: none; font-size: 14px; margin-left: 20px; }
+    nav a:hover { color: var(--text); }
+    .container { max-width: 660px; margin: 0 auto; padding: 48px 24px; }
+    h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .subtitle { color: var(--muted); margin-bottom: 40px; line-height: 1.6; font-size: 15px; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .input-row { display: flex; gap: 12px; }
+    input[type="text"] {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 12px 16px; border-radius: 8px; font-size: 15px; outline: none;
+    }
+    input:focus { border-color: var(--accent); }
+    button[type="submit"] {
+      background: var(--accent); color: white; border: none; padding: 12px 24px;
+      border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    button[type="submit"]:hover { background: var(--accent2); }
+    button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
+    .result { margin-top: 24px; padding: 20px; border-radius: 12px; border: 1px solid var(--border); display: none; }
+    .result.success { border-color: var(--green); background: rgba(52,211,153,0.05); }
+    .result.partial { border-color: var(--yellow); background: rgba(251,191,36,0.05); }
+    .result.failure { border-color: var(--yellow); background: rgba(251,191,36,0.05); }
+    .result.error { border-color: var(--red); background: rgba(248,113,113,0.05); }
+    .result-title { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+    .result.success .result-title { color: var(--green); }
+    .result.partial .result-title { color: var(--yellow); }
+    .result.failure .result-title { color: var(--yellow); }
+    .result.error .result-title { color: var(--red); }
+    .result-body { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .found-record {
+      margin-top: 12px; padding: 14px 16px; border-radius: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+    }
+    .found-record.agent-record { border-color: rgba(99,102,241,0.3); }
+    .found-record.skill-record { border-color: rgba(167,139,250,0.3); }
+    .found-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .found-record.agent-record .found-label { color: var(--accent2); }
+    .found-record.skill-record .found-label { color: var(--purple); }
+    .found-name { font-weight: 700; font-size: 15px; }
+    .found-caps { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .found-link { font-size: 13px; margin-top: 8px; }
+    .found-link a { color: var(--accent2); text-decoration: none; }
+    .instructions { margin-top: 20px; }
+    .instructions h3 { font-size: 14px; color: var(--text); margin-bottom: 12px; font-weight: 700; }
+    code {
+      display: block; background: var(--code-bg); border: 1px solid var(--border);
+      padding: 14px 16px; border-radius: 8px; font-family: 'Fira Code', monospace;
+      font-size: 12px; color: var(--accent2); word-break: break-all;
+      white-space: pre-wrap; margin-bottom: 12px;
+    }
+    .step { margin-bottom: 10px; padding-left: 20px; position: relative; font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .step::before { content: attr(data-n); position: absolute; left: 0; color: var(--accent2); font-weight: 700; }
+    .spec-link { margin-top: 14px; font-size: 13px; }
+    .spec-link a { color: var(--accent2); }
+
+    /* Info boxes */
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px; }
+    .info-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px;
+    }
+    .info-box-icon { font-size: 20px; margin-bottom: 8px; }
+    .info-box h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .info-box p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    code.inline { display: inline; padding: 2px 7px; font-size: 12px; white-space: nowrap; }
+    @media (max-width: 500px) { .info-grid { grid-template-columns: 1fr; } .input-row { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="/">
+      <span class="logo-icon">🌐</span>
+      <div>
+        <div class="logo-text">AgentRoot</div>
+        <div class="logo-tagline">The Agentic Web Directory</div>
+      </div>
+    </a>
+    <nav>
+      <a href="/">Directory</a>
+      <a href="/howitworks.html">How It Works</a>
+      <a href="/api.html">API Docs</a>
+      <a href="/spec.html">Spec</a>
+      <a href="/submit.html" style="color:var(--accent2)">Submit</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Submit Your Domain</h1>
+    <p class="subtitle">
+      AgentRoot checks your domain for <code class="inline" style="background:var(--surface2);color:var(--accent2)">_agent</code> and <code class="inline" style="background:var(--surface2);color:var(--purple)">_skill</code> TXT records and indexes whatever it finds. No signup required.
+    </p>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="info-box-icon">🤖</div>
+        <h3>Registering an Agent?</h3>
+        <p>Add a <code class="inline" style="background:var(--surface2);color:var(--accent2)">_agent.yourdomain.com</code> TXT record. Agents are autonomous entities with endpoints and capabilities.</p>
+      </div>
+      <div class="info-box">
+        <div class="info-box-icon">🔧</div>
+        <h3>Publishing a Skill?</h3>
+        <p>Add a <code class="inline" style="background:var(--surface2);color:var(--purple)">_skill.yourdomain.com</code> TXT record. Skills are callable tools — MCP, OpenAPI, REST, GraphQL, gRPC.</p>
+      </div>
+    </div>
+
+    <form id="submit-form">
+      <div class="form-group">
+        <label>Your Domain</label>
+        <div class="input-row">
+          <input type="text" id="domain-input" placeholder="yourdomain.com" autocomplete="off" spellcheck="false" />
+          <button type="submit" id="submit-btn">Check DNS</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="result" id="result">
+      <div class="result-title" id="result-title"></div>
+      <div class="result-body" id="result-body"></div>
+      <div id="result-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('submit-form');
+    const input = document.getElementById('domain-input');
+    const btn = document.getElementById('submit-btn');
+    const result = document.getElementById('result');
+    const resultTitle = document.getElementById('result-title');
+    const resultBody = document.getElementById('result-body');
+    const resultContent = document.getElementById('result-content');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const domain = input.value.trim();
+      if (!domain) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Checking DNS…';
+      result.style.display = 'none';
+
+      try {
+        const r = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domain })
+        }).then(r => r.json());
+
+        result.style.display = 'block';
+
+        if (r.error) {
+          result.className = 'result error';
+          resultTitle.textContent = '✗ Error';
+          resultBody.textContent = r.error;
+          resultContent.innerHTML = '';
+          return;
+        }
+
+        const found = r.found || [];
+
+        if (found.length > 0) {
+          result.className = found.length === 2 ? 'result success' : 'result partial';
+          resultTitle.textContent = found.length === 2 ? '✓ Found both _agent and _skill records!' : `✓ Found ${found.join(' and ')} record!`;
+          resultBody.textContent = r.message;
+
+          let html = '';
+
+          if (r.agent && r.agent.status === 'active') {
+            html += `
+              <div class="found-record agent-record">
+                <div class="found-label">🤖 Agent</div>
+                <div class="found-name">${esc(r.agent.name || r.agent.domain)}</div>
+                <div class="found-caps">${esc(r.agent.capabilities || '')}</div>
+                <div class="found-link"><a href="/agents/${encodeURIComponent(r.agent.domain)}">View agent page →</a></div>
+              </div>`;
+          }
+
+          if (r.skill && r.skill.status === 'active') {
+            html += `
+              <div class="found-record skill-record" style="margin-top:10px">
+                <div class="found-label">🔧 Skill</div>
+                <div class="found-name">${esc(r.skill.name || r.skill.domain)}</div>
+                <div class="found-caps">${esc(r.skill.proto ? 'proto: ' + r.skill.proto + ' · ' : '')}${esc(r.skill.capabilities || '')}</div>
+              </div>`;
+          }
+
+          resultContent.innerHTML = html;
+        } else {
+          result.className = 'result failure';
+          resultTitle.textContent = '⚠ No TXT records found';
+          resultBody.textContent = r.message;
+          const inst = r.instructions || {};
+          resultContent.innerHTML = `
+            <div class="instructions">
+              <h3>To get indexed, add one or both of these DNS records:</h3>
+              <p style="font-size:13px;color:var(--accent2);font-weight:600;margin-bottom:6px">_agent record (for autonomous agents):</p>
+              <code>${esc(inst.agent ? `; Host\n_agent.${esc(domain)}\n\n; Type\nTXT\n\n; Value\n${inst.agent.value}` : `_agent.${esc(domain)}  TXT  "v=agent1 name=YourAgent caps=your,capabilities endpoint=https://${esc(domain)}/a2a"`)}</code>
+              <p style="font-size:13px;color:var(--purple);font-weight:600;margin-bottom:6px;margin-top:12px">_skill record (for callable tools):</p>
+              <code>${esc(inst.skill ? `; Host\n_skill.${esc(domain)}\n\n; Type\nTXT\n\n; Value\n${inst.skill.value}` : `_skill.${esc(domain)}  TXT  "v=skill1 name=YourSkill proto=mcp caps=tool1,tool2 endpoint=https://${esc(domain)}/mcp"`)}</code>
+              <div class="step" data-n="1">Log in to your DNS provider (Cloudflare, Route53, Namecheap, etc.)</div>
+              <div class="step" data-n="2">Add TXT record(s) with the hosts and values above</div>
+              <div class="step" data-n="3">Wait for DNS propagation (usually &lt; 5 min), then resubmit</div>
+              <div class="spec-link"><a href="/spec.html">Full TXT record spec →</a></div>
+            </div>
+          `;
+        }
+      } catch (e) {
+        result.style.display = 'block';
+        result.className = 'result error';
+        resultTitle.textContent = '✗ Request failed';
+        resultBody.textContent = e.message;
+        resultContent.innerHTML = '';
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Check DNS';
+    });
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    const params = new URLSearchParams(location.search);
+    if (params.get('domain')) input.value = params.get('domain');
+  </script>
+</body>
+</html>
