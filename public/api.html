@@ -4,469 +4,231 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>API Docs — AgentRoot</title>
-  <meta name="description" content="AgentRoot API documentation. Query the agent registry, submit domains, get stats, and embed badges. Open REST API, no auth required.">
-  <meta property="og:title" content="API Docs — AgentRoot">
-  <meta property="og:description" content="Open REST API for the DNS-native agent registry. Query, filter, and integrate agent discovery into your apps.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://agentroot.io/api.html">
-  <meta property="og:site_name" content="AgentRoot">
+  <meta name="description" content="AgentRoot REST API documentation. Query the agent and skill registry programmatically.">
+  <link rel="canonical" href="https://agentroot.io/api.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/shared.css">
   <style>
-    :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --surface2: #1a1a24;
-      --border: #2a2a3a;
-      --text: #e8e8f0;
-      --muted: #888899;
-      --accent: #6366f1;
-      --accent2: #818cf8;
-      --green: #34d399;
-      --yellow: #fbbf24;
-      --red: #f87171;
-      --code-bg: #0d0d15;
-      --get: #34d399;
-      --post: #fbbf24;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
-
-    header {
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
-    .logo-icon { font-size: 24px; }
-    .logo-text { font-size: 18px; font-weight: 700; }
-    .logo-tagline { font-size: 12px; color: var(--muted); }
-    nav { display: flex; align-items: center; gap: 4px; }
-    nav a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
-    nav a:hover { color: var(--text); background: var(--surface2); }
-    nav a.active { color: var(--accent2); }
-
-    /* Layout: sidebar + content */
-    .layout { display: flex; max-width: 1100px; margin: 0 auto; gap: 0; }
-    
-    .sidebar {
-      width: 220px;
-      flex-shrink: 0;
-      padding: 32px 24px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-      border-right: 1px solid var(--border);
-    }
-    .sidebar-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
-    .sidebar-link {
-      display: block; color: var(--muted); text-decoration: none;
-      font-size: 13px; padding: 6px 8px; border-radius: 6px;
-      margin-bottom: 2px; transition: all 0.15s;
-    }
-    .sidebar-link:hover { color: var(--text); background: var(--surface2); }
-    .sidebar-section { margin-bottom: 20px; }
-    
-    .content { flex: 1; padding: 48px 48px 80px; max-width: 820px; }
-
-    h1 { font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px; }
-    .intro { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 48px; }
-    .intro a { color: var(--accent2); text-decoration: none; }
-
-    .endpoint-block {
-      margin-bottom: 60px;
-      scroll-margin-top: 32px;
-    }
-    .endpoint-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .method {
-      font-size: 11px; font-weight: 800; letter-spacing: 0.08em;
-      padding: 4px 10px; border-radius: 6px;
-      background: rgba(52,211,153,0.1); color: var(--get); border: 1px solid rgba(52,211,153,0.25);
-    }
-    .method.post { background: rgba(251,191,36,0.1); color: var(--post); border-color: rgba(251,191,36,0.25); }
-    .endpoint-path { font-family: monospace; font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
-    .endpoint-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
-    
-    h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 20px 0 10px; }
-
-    .params-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      margin-bottom: 20px;
-    }
-    .params-table th {
-      text-align: left; padding: 8px 12px;
-      background: var(--surface); color: var(--muted);
-      font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
-      border-bottom: 1px solid var(--border);
-    }
-    .params-table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-    .params-table tr:last-child td { border-bottom: none; }
-    .param-name { font-family: monospace; color: var(--accent2); font-size: 12px; }
-    .param-type { color: var(--muted); font-size: 12px; }
-    .optional { color: var(--muted); font-style: italic; }
-
-    .code-block {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 20px;
-      font-family: 'Fira Code', 'Cascadia Code', monospace;
+    .api-layout { display: grid; grid-template-columns: 220px 1fr; gap: 48px; padding: 56px 0; }
+    .api-sidebar { position: sticky; top: 72px; align-self: start; }
+    .api-sidebar a {
+      display: block;
+      font-family: var(--mono);
       font-size: 12px;
-      color: var(--accent2);
-      overflow-x: auto;
-      line-height: 1.7;
-      white-space: pre;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      margin-bottom: 2px;
+    }
+    .api-sidebar a:hover { color: var(--text); background: var(--surface2); }
+    .api-sidebar .sidebar-section {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--border2);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 16px 12px 4px;
+    }
+    .endpoint { margin-bottom: 48px; }
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
       margin-bottom: 16px;
-      position: relative;
     }
-    .code-comment { color: var(--muted); }
-    .code-string { color: #86efac; }
-    .code-key { color: #93c5fd; }
-
-    .tab-bar { display: flex; gap: 2px; margin-bottom: 0; border-bottom: 1px solid var(--border); }
-    .tab {
-      padding: 6px 16px; font-size: 12px; cursor: pointer;
-      color: var(--muted); border-bottom: 2px solid transparent;
-      transition: all 0.15s; user-select: none;
+    .method {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
     }
-    .tab.active { color: var(--accent2); border-bottom-color: var(--accent); }
-
-    .divider { border: none; border-top: 1px solid var(--border); margin: 60px 0; }
-
-    .badge-demo {
-      display: flex; gap: 16px; align-items: center;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; padding: 16px 20px; margin-bottom: 16px;
-      flex-wrap: wrap;
+    .method-get { background: var(--blue-bg); color: var(--blue); }
+    .method-post { background: var(--green-bg); color: var(--green); }
+    .endpoint-path {
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
     }
-
+    .endpoint-desc {
+      font-size: 14px;
+      color: var(--text2);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .params-table { margin-bottom: 16px; }
     @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .content { padding: 32px 24px 60px; }
+      .api-layout { grid-template-columns: 1fr; }
+      .api-sidebar { display: none; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <a class="logo" href="/">
-      <span class="logo-icon">🌐</span>
-      <div>
-        <div class="logo-text">AgentRoot</div>
-        <div class="logo-tagline">Agent Registry</div>
-      </div>
-    </a>
-    <nav>
-      <a href="/">Registry</a>
-      <a href="/howitworks.html">How It Works</a>
-      <a href="/api.html" class="active">API Docs</a>
-      <a href="/spec.html">Spec</a>
-      <a href="/submit.html">Submit</a>
-    </nav>
-  </header>
+<header>
+  <a href="/" class="logo"><div class="logo-icon">⬡</div>AgentRoot</a>
+  <nav>
+    <a href="/">$ ls /registry</a>
+    <a href="/howitworks.html">$ man howto</a>
+    <a href="/spec.html">$ cat spec.txt</a>
+    <a href="/api.html" class="active">$ api --docs</a>
+    <a href="/submit.html" class="nav-submit">$ submit ↗</a>
+  </nav>
+  <button class="hamburger" onclick="document.querySelector('.mobile-nav').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="mobile-nav">
+  <a href="/">$ ls /registry</a>
+  <a href="/howitworks.html">$ man howto</a>
+  <a href="/spec.html">$ cat spec.txt</a>
+  <a href="/api.html">$ api --docs</a>
+  <a href="/submit.html">$ submit ↗</a>
+</div>
 
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-title">Endpoints</div>
-        <a class="sidebar-link" href="#get-agents">GET /api/agents</a>
-        <a class="sidebar-link" href="#get-agent">GET /api/agents/:domain</a>
-        <a class="sidebar-link" href="#post-submit">POST /api/submit</a>
-        <a class="sidebar-link" href="#get-stats">GET /api/stats</a>
-        <a class="sidebar-link" href="#get-categories">GET /api/categories</a>
-        <a class="sidebar-link" href="#get-badge">GET /api/agents/:domain/badge</a>
-        <a class="sidebar-link" href="#agent-card">GET /.well-known/agent-card.json</a>
-      </div>
-      <div class="sidebar-section">
-        <div class="sidebar-title">Guides</div>
-        <a class="sidebar-link" href="/howitworks.html">How It Works</a>
-        <a class="sidebar-link" href="/spec.html">TXT Record Spec</a>
-      </div>
-    </aside>
+<div style="border-bottom: 1px solid var(--border);">
+  <div class="page-hero">
+    <div class="page-eyebrow">Developer API</div>
+    <h1 class="page-title">$ api --docs</h1>
+    <p class="page-subtitle">Query the AgentRoot registry programmatically. Base URL: <code>https://agentroot.io</code></p>
+  </div>
+</div>
 
-    <div class="content">
-      <h1>API Reference</h1>
-      <p class="intro">
-        AgentRoot's REST API is open and requires no authentication. Base URL: <code style="background:var(--surface2);padding:2px 8px;border-radius:4px;font-family:monospace;font-size:13px">https://agentroot.io</code>. 
-        All responses are JSON. Rate limits may apply in the future — please be reasonable.
-        Questions? Check the <a href="/spec.html">TXT spec</a> or open an issue.
-      </p>
+<div class="container">
+  <div class="api-layout">
+    <div class="api-sidebar">
+      <div class="sidebar-section">Agents</div>
+      <a href="#get-agents">GET /api/agents</a>
+      <a href="#get-agent">GET /api/agents/:domain</a>
+      <a href="#agent-badge">GET /api/agents/:domain/badge</a>
+      <div class="sidebar-section">Skills</div>
+      <a href="#get-skills">GET /api/skills</a>
+      <a href="#get-skill">GET /api/skills/:domain</a>
+      <div class="sidebar-section">Discovery</div>
+      <a href="#discover">GET /api/discover</a>
+      <a href="#domains">GET /api/domains</a>
+      <div class="sidebar-section">Registry</div>
+      <a href="#submit">POST /api/submit</a>
+      <a href="#stats">GET /api/stats</a>
+      <a href="#agent-card">GET /.well-known/agent-card.json</a>
+    </div>
 
-      <!-- GET /api/agents -->
-      <div class="endpoint-block" id="get-agents">
+    <div>
+
+      <div class="endpoint" id="get-agents">
         <div class="endpoint-header">
-          <span class="method">GET</span>
+          <span class="method method-get">GET</span>
           <span class="endpoint-path">/api/agents</span>
         </div>
-        <div class="endpoint-desc">
-          List all active agents in the registry. Supports text search and filtering by capabilities, category, and status.
-          Returns agents verified via DNS — no pending or failed entries.
-        </div>
-
-        <h3>Query Parameters</h3>
+        <p class="endpoint-desc">List all registered agents. Supports filtering by search query, capabilities, and status.</p>
         <table class="params-table">
-          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-          <tr><td class="param-name">q</td><td class="param-type">string</td><td>Full-text search across name, domain, description, capabilities</td></tr>
-          <tr><td class="param-name">caps</td><td class="param-type">string</td><td>Filter by capabilities (AND logic). Comma-separated: <code style="font-family:monospace;font-size:12px">caps=research,finance</code></td></tr>
-          <tr><td class="param-name">category</td><td class="param-type">string</td><td>Filter by category: research, finance, devtools, data, communication, automation, media, security</td></tr>
-          <tr><td class="param-name">status</td><td class="param-type">string</td><td class="optional">Filter by status (active, pending, failed). Default: active only</td></tr>
+          <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>q</td><td>string</td><td>Search name, domain, description, capabilities</td></tr>
+            <tr><td>caps</td><td>string</td><td>Filter by capability (comma-separated for AND logic)</td></tr>
+            <tr><td>status</td><td>string</td><td>active | pending | failed</td></tr>
+          </tbody>
         </table>
+        <div class="code-block">curl https://agentroot.io/api/agents
+curl "https://agentroot.io/api/agents?q=search&caps=analyze"</div>
+      </div>
 
-        <h3>Example Request</h3>
-        <div class="code-block"><span class="code-comment"># Get all agents</span>
-curl https://agentroot.io/api/agents
+      <div class="endpoint" id="get-skill">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/skills</span>
+        </div>
+        <p class="endpoint-desc">List all registered skills. Supports filtering by protocol, auth type, cost, and capabilities.</p>
+        <table class="params-table">
+          <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>q</td><td>string</td><td>Search name, domain, description</td></tr>
+            <tr><td>proto</td><td>string</td><td>mcp | openapi | rest | graphql | a2a | grpc</td></tr>
+            <tr><td>auth</td><td>string</td><td>none | apikey | oauth | bearer</td></tr>
+            <tr><td>cost</td><td>string</td><td>free | paid | freemium</td></tr>
+            <tr><td>caps</td><td>string</td><td>Filter by capability</td></tr>
+          </tbody>
+        </table>
+        <div class="code-block">curl "https://agentroot.io/api/skills?proto=mcp&cost=free"</div>
+      </div>
 
-<span class="code-comment"># Search by keyword</span>
-curl "https://agentroot.io/api/agents?q=finance"
+      <div class="endpoint" id="discover">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/api/discover</span>
+        </div>
+        <p class="endpoint-desc">Combined discovery endpoint. Returns agents and skills in one call. Designed for agents building their tool set.</p>
+        <div class="code-block">curl https://agentroot.io/api/discover
 
-<span class="code-comment"># Filter by multiple caps (AND logic)</span>
-curl "https://agentroot.io/api/agents?caps=research,finance"
-
-<span class="code-comment"># Filter by category</span>
-curl "https://agentroot.io/api/agents?category=devtools"</div>
-
-        <h3>Response</h3>
-        <div class="code-block">{
-  <span class="code-key">"agents"</span>: [
-    {
-      <span class="code-key">"id"</span>: <span class="code-string">1</span>,
-      <span class="code-key">"domain"</span>: <span class="code-string">"example.com"</span>,
-      <span class="code-key">"name"</span>: <span class="code-string">"MyAgent"</span>,
-      <span class="code-key">"description"</span>: <span class="code-string">"A helpful AI agent"</span>,
-      <span class="code-key">"capabilities"</span>: <span class="code-string">"research,summarize"</span>,
-      <span class="code-key">"endpoint"</span>: <span class="code-string">"https://example.com/a2a"</span>,
-      <span class="code-key">"protocol"</span>: <span class="code-string">"a2a"</span>,
-      <span class="code-key">"card_url"</span>: <span class="code-string">"https://example.com/.well-known/agent-card.json"</span>,
-      <span class="code-key">"category"</span>: <span class="code-string">"research"</span>,
-      <span class="code-key">"status"</span>: <span class="code-string">"active"</span>,
-      <span class="code-key">"first_verified"</span>: <span class="code-string">"2026-03-01T12:00:00Z"</span>,
-      <span class="code-key">"last_verified"</span>: <span class="code-string">"2026-03-01T18:00:00Z"</span>,
-      <span class="code-key">"last_checked"</span>: <span class="code-string">"2026-03-01T18:00:00Z"</span>,
-      <span class="code-key">"submitted_at"</span>: <span class="code-string">"2026-03-01T12:00:00Z"</span>,
-      <span class="code-key">"raw_record"</span>: <span class="code-string">"v=agent1 name=MyAgent caps=research,summarize endpoint=https://example.com/a2a"</span>
-    }
-  ],
-  <span class="code-key">"count"</span>: <span class="code-string">1</span>
+<span class="c"># Response</span>
+{
+  "agents": [...],
+  "skills": [...],
+  "totals": { "agents": 0, "skills": 0 }
 }</div>
       </div>
 
-      <hr class="divider">
-
-      <!-- GET /api/agents/:domain -->
-      <div class="endpoint-block" id="get-agent">
+      <div class="endpoint" id="submit">
         <div class="endpoint-header">
-          <span class="method">GET</span>
-          <span class="endpoint-path">/api/agents/:domain</span>
-        </div>
-        <div class="endpoint-desc">
-          Get a single agent by domain name. Returns all fields including raw DNS record.
-          Works for any status (active, pending, failed).
-        </div>
-
-        <h3>Example Request</h3>
-        <div class="code-block">curl https://agentroot.io/api/agents/example.com</div>
-
-        <h3>Response</h3>
-        <div class="code-block">{
-  <span class="code-key">"agent"</span>: {
-    <span class="code-comment">// ... same fields as above</span>
-  }
-}
-
-<span class="code-comment"># 404 if not found:</span>
-{ <span class="code-key">"error"</span>: <span class="code-string">"Agent not found"</span> }</div>
-      </div>
-
-      <hr class="divider">
-
-      <!-- POST /api/submit -->
-      <div class="endpoint-block" id="post-submit">
-        <div class="endpoint-header">
-          <span class="method post">POST</span>
+          <span class="method method-post">POST</span>
           <span class="endpoint-path">/api/submit</span>
         </div>
-        <div class="endpoint-desc">
-          Submit a domain for indexing. AgentRoot performs a live DNS lookup for <code style="font-family:monospace;font-size:12px">_agent.&lt;domain&gt;</code>.
-          If found, the agent is indexed immediately and returns <code style="font-family:monospace;font-size:12px">status: "active"</code>.
-          If not found, the domain is stored as pending and instructions are returned.
-        </div>
-
-        <h3>Request Body</h3>
-        <table class="params-table">
-          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
-          <tr><td class="param-name">domain</td><td class="param-type">string</td><td>Domain to submit (e.g., <code style="font-family:monospace;font-size:12px">example.com</code>). Required.</td></tr>
-        </table>
-
-        <h3>Example Request</h3>
+        <p class="endpoint-desc">Submit a domain for registration. AgentRoot will query <code>_agent.&lt;domain&gt;</code> and <code>_skill.&lt;domain&gt;</code> via DNS and index whatever records it finds.</p>
         <div class="code-block">curl -X POST https://agentroot.io/api/submit \
-  -H "Content-Type: application/json" \
-  -d '{"domain": "example.com"}'</div>
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"domain": "yourdomain.com"}'</span>
 
-        <h3>Response — DNS Record Found</h3>
-        <div class="code-block">{
-  <span class="code-key">"success"</span>: true,
-  <span class="code-key">"status"</span>: <span class="code-string">"active"</span>,
-  <span class="code-key">"message"</span>: <span class="code-string">"_agent.example.com TXT record found and indexed!"</span>,
-  <span class="code-key">"agent"</span>: { <span class="code-comment">/* full agent object */</span> }
-}</div>
-
-        <h3>Response — No DNS Record Found</h3>
-        <div class="code-block">{
-  <span class="code-key">"success"</span>: false,
-  <span class="code-key">"status"</span>: <span class="code-string">"pending"</span>,
-  <span class="code-key">"message"</span>: <span class="code-string">"No _agent.example.com TXT record found. Add one to get indexed!"</span>,
-  <span class="code-key">"instructions"</span>: {
-    <span class="code-key">"record"</span>: <span class="code-string">"_agent.example.com"</span>,
-    <span class="code-key">"type"</span>: <span class="code-string">"TXT"</span>,
-    <span class="code-key">"value"</span>: <span class="code-string">"v=agent1 name=YourAgent caps=your,capabilities endpoint=https://example.com/a2a"</span>,
-    <span class="code-key">"spec"</span>: <span class="code-string">"https://agentroot.io/spec.html"</span>
+<span class="c"># Response (agent found)</span>
+{
+  "agent": {
+    "domain": "yourdomain.com",
+    "name": "MyAgent",
+    "capabilities": "search,analyze",
+    "status": "active"
   }
-}
-
-<span class="code-comment"># Error cases:</span>
-{ <span class="code-key">"error"</span>: <span class="code-string">"domain is required"</span> }      <span class="code-comment"># 400</span>
-{ <span class="code-key">"error"</span>: <span class="code-string">"Invalid domain format"</span> }   <span class="code-comment"># 400</span></div>
+}</div>
       </div>
 
-      <hr class="divider">
-
-      <!-- GET /api/stats -->
-      <div class="endpoint-block" id="get-stats">
+      <div class="endpoint" id="stats">
         <div class="endpoint-header">
-          <span class="method">GET</span>
+          <span class="method method-get">GET</span>
           <span class="endpoint-path">/api/stats</span>
         </div>
-        <div class="endpoint-desc">Registry statistics — total agents, active/pending/failed counts, last verification run, and breakdown by TLD.</div>
+        <p class="endpoint-desc">Registry statistics.</p>
+        <div class="code-block">curl https://agentroot.io/api/stats
 
-        <h3>Example Request</h3>
-        <div class="code-block">curl https://agentroot.io/api/stats</div>
-
-        <h3>Response</h3>
-        <div class="code-block">{
-  <span class="code-key">"total"</span>: 42,
-  <span class="code-key">"active"</span>: 38,
-  <span class="code-key">"pending"</span>: 3,
-  <span class="code-key">"failed"</span>: 1,
-  <span class="code-key">"lastVerification"</span>: <span class="code-string">"2026-03-01T18:00:00.000Z"</span>,
-  <span class="code-key">"byTld"</span>: {
-    <span class="code-key">"com"</span>: 20,
-    <span class="code-key">"io"</span>: 12,
-    <span class="code-key">"ai"</span>: 6
-  }
+{
+  "total": 0,
+  "active": 0,
+  "totalSkills": 0,
+  "activeSkills": 0,
+  "lastVerification": "2026-03-01T..."
 }</div>
       </div>
 
-      <hr class="divider">
-
-      <!-- GET /api/categories -->
-      <div class="endpoint-block" id="get-categories">
+      <div class="endpoint" id="agent-card">
         <div class="endpoint-header">
-          <span class="method">GET</span>
-          <span class="endpoint-path">/api/categories</span>
-        </div>
-        <div class="endpoint-desc">List all capability categories with agent counts. Categories are derived from agents' <code style="font-family:monospace;font-size:12px">caps=</code> field at registration time.</div>
-
-        <h3>Example Request</h3>
-        <div class="code-block">curl https://agentroot.io/api/categories</div>
-
-        <h3>Response</h3>
-        <div class="code-block">{
-  <span class="code-key">"categories"</span>: [
-    { <span class="code-key">"id"</span>: <span class="code-string">"research"</span>, <span class="code-key">"label"</span>: <span class="code-string">"Research"</span>, <span class="code-key">"emoji"</span>: <span class="code-string">"🔍"</span>, <span class="code-key">"desc"</span>: <span class="code-string">"Search, browse, and knowledge agents"</span>, <span class="code-key">"count"</span>: 8 },
-    { <span class="code-key">"id"</span>: <span class="code-string">"finance"</span>, <span class="code-key">"label"</span>: <span class="code-string">"Finance"</span>, <span class="code-key">"emoji"</span>: <span class="code-string">"💰"</span>, <span class="code-key">"desc"</span>: <span class="code-string">"Trading, crypto, and payments agents"</span>, <span class="code-key">"count"</span>: 5 },
-    <span class="code-comment">// ... 6 more categories</span>
-  ]
-}</div>
-      </div>
-
-      <hr class="divider">
-
-      <!-- GET badge -->
-      <div class="endpoint-block" id="get-badge">
-        <div class="endpoint-header">
-          <span class="method">GET</span>
-          <span class="endpoint-path">/api/agents/:domain/badge</span>
-        </div>
-        <div class="endpoint-desc">
-          Returns an SVG badge showing whether a domain is listed on AgentRoot. 
-          Useful for embedding in READMEs, websites, or agent cards.
-        </div>
-
-        <h3>Example Request</h3>
-        <div class="code-block">curl https://agentroot.io/api/agents/example.com/badge</div>
-
-        <h3>Embed Code</h3>
-        <div class="code-block"><span class="code-comment">&lt;!-- In HTML --&gt;</span>
-&lt;a href="https://agentroot.io/agents/example.com"&gt;
-  &lt;img src="https://agentroot.io/api/agents/example.com/badge" alt="Listed on AgentRoot"&gt;
-&lt;/a&gt;
-
-<span class="code-comment"># In Markdown (README)</span>
-[![Listed on AgentRoot](https://agentroot.io/api/agents/example.com/badge)](https://agentroot.io/agents/example.com)</div>
-
-        <h3>Badge Preview</h3>
-        <div class="badge-demo">
-          <div>
-            <img id="badge-preview" src="/api/agents/agentroot.io/badge" alt="Listed on AgentRoot" style="height:20px;display:block;">
-            <div style="font-size:11px;color:var(--muted);margin-top:6px">Active agent</div>
-          </div>
-          <div>
-            <img src="/api/agents/notregistered.example/badge" alt="Not listed" style="height:20px;display:block;">
-            <div style="font-size:11px;color:var(--muted);margin-top:6px">Not listed</div>
-          </div>
-        </div>
-        <p style="font-size:13px;color:var(--muted)">Badge is cached for 5 minutes. SVG format, shields.io style.</p>
-      </div>
-
-      <hr class="divider">
-
-      <!-- /.well-known/agent-card.json -->
-      <div class="endpoint-block" id="agent-card">
-        <div class="endpoint-header">
-          <span class="method">GET</span>
+          <span class="method method-get">GET</span>
           <span class="endpoint-path">/.well-known/agent-card.json</span>
         </div>
-        <div class="endpoint-desc">
-          AgentRoot's own agent card — its declaration of capabilities, endpoint, and skills in the 
-          <a href="https://google.github.io/A2A/" target="_blank" style="color:var(--accent2);text-decoration:none">A2A agent card format</a>.
-          Any agent that implements A2A can discover AgentRoot's capabilities through this endpoint.
-        </div>
-
-        <h3>Example Request</h3>
+        <p class="endpoint-desc">AgentRoot's own agent card. Part of the open agent discovery standard — any agent can fetch this to understand what AgentRoot can do.</p>
         <div class="code-block">curl https://agentroot.io/.well-known/agent-card.json</div>
-
-        <h3>Response</h3>
-        <div class="code-block">{
-  <span class="code-key">"name"</span>: <span class="code-string">"AgentRoot"</span>,
-  <span class="code-key">"description"</span>: <span class="code-string">"DNS-native agent registry for the agentic internet..."</span>,
-  <span class="code-key">"version"</span>: <span class="code-string">"1.0.0"</span>,
-  <span class="code-key">"endpoint"</span>: <span class="code-string">"https://agentroot.io/a2a"</span>,
-  <span class="code-key">"protocol"</span>: <span class="code-string">"a2a"</span>,
-  <span class="code-key">"capabilities"</span>: [<span class="code-string">"agent_discovery"</span>, <span class="code-string">"registry_query"</span>, <span class="code-string">"dns_verification"</span>, <span class="code-string">"agent_submission"</span>],
-  <span class="code-key">"skills"</span>: [
-    { <span class="code-key">"name"</span>: <span class="code-string">"discover_agents"</span>, <span class="code-key">"description"</span>: <span class="code-string">"Find agents by capability, name, or domain"</span> },
-    { <span class="code-key">"name"</span>: <span class="code-string">"submit_domain"</span>, <span class="code-key">"description"</span>: <span class="code-string">"Submit a domain for _agent DNS record indexing"</span> },
-    { <span class="code-key">"name"</span>: <span class="code-string">"verify_domain"</span>, <span class="code-key">"description"</span>: <span class="code-string">"Re-verify a domain's _agent DNS record"</span> },
-    { <span class="code-key">"name"</span>: <span class="code-string">"registry_stats"</span>, <span class="code-key">"description"</span>: <span class="code-string">"Get statistics about the indexed agent registry"</span> }
-  ]
-}</div>
-
-        <h3>Calling AgentRoot via A2A</h3>
-        <div class="code-block"><span class="code-comment"># Discover agents with specific capabilities</span>
-curl -X POST https://agentroot.io/a2a \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "task-001",
-    "skill": "discover_agents",
-    "input": { "capabilities": "research,finance" }
-  }'</div>
       </div>
 
     </div>
   </div>
+</div>
+
+<footer>
+  <div class="footer-left">© 2026 AgentRoot</div>
+  <div class="footer-right">
+    <a href="/spec.html">Spec</a>
+    <a href="/howitworks.html">How it works</a>
+    <a href="/submit.html">Submit</a>
+  </div>
+</footer>
 </body>
 </html>

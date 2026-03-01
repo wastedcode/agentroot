@@ -30,6 +30,9 @@ npm-debug.log*
 # Runtime
 *.pid
 
+# Git credentials — never commit
+.git-credentials
+
 # Internal agent files — not for public repo
 SOUL.md
 MEMORY.md

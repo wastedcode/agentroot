@@ -3,405 +3,164 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TXT Record Specification — AgentRoot</title>
-  <meta name="description" content="The _agent and _skill DNS TXT record format specifications. Learn how to publish your AI agent or callable skill on AgentRoot.">
-  <meta property="og:title" content="_agent and _skill TXT Record Spec — AgentRoot">
-  <meta property="og:description" content="Publish your AI agent or callable skill via a single DNS TXT record. Full specification and field reference.">
-  <meta property="og:url" content="https://agentroot.io/spec.html">
+  <title>TXT Record Spec — AgentRoot</title>
+  <meta name="description" content="The _agent and _skill DNS TXT record format specification. Open standard for agent and skill discovery via DNS.">
+  <link rel="canonical" href="https://agentroot.io/spec.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/shared.css">
   <style>
-    :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --surface2: #1a1a24;
-      --border: #2a2a3a;
-      --text: #e8e8f0;
-      --muted: #888899;
-      --accent: #6366f1;
-      --accent2: #818cf8;
-      --green: #34d399;
-      --yellow: #fbbf24;
-      --code-bg: #0d0d15;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
-
-    header {
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
-    .logo-icon { font-size: 24px; }
-    .logo-text { font-size: 18px; font-weight: 700; }
-    .logo-tagline { font-size: 12px; color: var(--muted); }
-    nav a { color: var(--muted); text-decoration: none; font-size: 14px; margin-left: 20px; }
-    nav a:hover { color: var(--text); }
-
-    .container { max-width: 760px; margin: 0 auto; padding: 48px 24px; }
-    h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-    .subtitle { color: var(--muted); margin-bottom: 40px; line-height: 1.6; font-size: 15px; }
-
-    h2 { font-size: 18px; font-weight: 700; margin: 36px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-    h3 { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 8px; }
-    p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 12px; }
-
-    .code-block {
-      background: var(--code-bg);
+    .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 48px; }
+    .spec-card {
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      font-family: 'Fira Code', 'Cascadia Code', monospace;
-      font-size: 13px;
-      color: var(--accent2);
-      white-space: pre;
-      overflow-x: auto;
-      margin: 12px 0 20px;
-      position: relative;
+      border-radius: var(--radius);
+      padding: 28px;
     }
-    .copy-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-    .copy-btn:hover { color: var(--text); }
-
-    .field-table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 13px; }
-    .field-table th { text-align: left; color: var(--muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-    .field-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
-    .field-table tr:last-child td { border-bottom: none; }
-    .field-name { color: var(--accent2); font-family: monospace; }
-    .required { color: var(--green); font-size: 11px; }
-    .optional { color: var(--muted); font-size: 11px; }
-
-    .note {
-      background: var(--surface2);
-      border-left: 3px solid var(--accent);
-      padding: 12px 16px;
-      border-radius: 0 8px 8px 0;
-      font-size: 13px;
-      color: var(--muted);
-      margin: 12px 0;
-    }
-    .note strong { color: var(--text); }
-
-    .version-badge {
-      display: inline-block;
-      background: var(--accent);
-      color: white;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
+    .spec-card h3 { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .spec-card .spec-type { font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 12px; }
+    .spec-card p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+    @media (max-width: 700px) { .spec-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <header>
-    <a class="logo" href="/">
-      <span class="logo-icon">🌐</span>
-      <div>
-        <div class="logo-text">AgentRoot</div>
-        <div class="logo-tagline">The Agentic Web Directory</div>
-      </div>
-    </a>
-    <nav>
-      <a href="/">Directory</a>
-      <a href="/howitworks.html">How It Works</a>
-      <a href="/api.html">API Docs</a>
-      <a href="/spec.html" style="color:var(--accent2)">Spec</a>
-      <a href="/submit.html">Submit</a>
-    </nav>
-  </header>
+<header>
+  <a href="/" class="logo"><div class="logo-icon">⬡</div>AgentRoot</a>
+  <nav>
+    <a href="/">$ ls /registry</a>
+    <a href="/howitworks.html">$ man howto</a>
+    <a href="/spec.html" class="active">$ cat spec.txt</a>
+    <a href="/api.html">$ api --docs</a>
+    <a href="/submit.html" class="nav-submit">$ submit ↗</a>
+  </nav>
+  <button class="hamburger" onclick="document.querySelector('.mobile-nav').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="mobile-nav">
+  <a href="/">$ ls /registry</a>
+  <a href="/howitworks.html">$ man howto</a>
+  <a href="/spec.html">$ cat spec.txt</a>
+  <a href="/api.html">$ api --docs</a>
+  <a href="/submit.html">$ submit ↗</a>
+</div>
 
-  <div class="container">
-    <h1>DNS TXT Record Specifications <span class="version-badge">v1</span></h1>
-    <p class="subtitle">
-      AgentRoot defines two DNS TXT record formats: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent2)">_agent</code> for autonomous AI agents, and <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--purple)">_skill</code> for callable tools. Any domain can publish one or both. AgentRoot reads them and indexes the agentic internet.
-    </p>
+<div style="border-bottom: 1px solid var(--border);">
+  <div class="page-hero">
+    <div class="page-eyebrow">Open Standard</div>
+    <h1 class="page-title">$ cat spec.txt</h1>
+    <p class="page-subtitle">The <code>_agent</code> and <code>_skill</code> DNS TXT record format. Version 1. Open standard — implement it yourself, fork it, improve it.</p>
+  </div>
+</div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
-      <div style="background:var(--surface);border:1px solid rgba(99,102,241,0.3);border-radius:10px;padding:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">_agent</div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:6px">Autonomous agents</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5">Entities with memory, state, and conversation. They talk to you. Register at <code>_agent.yourdomain.com</code>.</div>
+<div class="container">
+
+  <div class="content-section">
+    <div class="section-label">// overview</div>
+    <h2 class="section-title">Two record types</h2>
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h3>_agent</h3>
+        <div class="spec-type">Autonomous AI agent</div>
+        <p>An agent has memory, makes decisions, and acts on your behalf. It's an entity, not just a function call. Use <code>_agent</code> for things that think.</p>
       </div>
-      <div style="background:var(--surface);border:1px solid rgba(167,139,250,0.3);border-radius:10px;padding:16px">
-        <div style="font-size:12px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">_skill</div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:6px">Callable skills / tools</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5">Stateless request/response tools. You call them. MCP, OpenAPI, GraphQL, REST, gRPC. Register at <code>_skill.yourdomain.com</code>.</div>
+      <div class="spec-card">
+        <h3>_skill</h3>
+        <div class="spec-type">Callable tool or API</div>
+        <p>A skill is a stateless capability — a function you can call. Use <code>_skill</code> for APIs, MCP servers, and tools that do one thing well.</p>
       </div>
     </div>
-
-    <hr style="border:none;border-top:1px solid var(--border);margin:40px 0">
-    <h1 style="font-size:22px;margin-bottom:8px">Part 1: <code style="color:var(--accent2)">_agent</code> Record</h1>
-
-    <h2>Overview</h2>
-    <p>Add a TXT record to your DNS at <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent2)">_agent.&lt;yourdomain&gt;</code>. 
-    The record encodes your agent's name, capabilities, endpoint, and other metadata in a simple key=value format.
-    No web server required for discovery — just DNS.</p>
-
-    <h2>Subdomain Support</h2>
-    <p>The <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent2)">_agent</code> TXT record works on <strong style="color:var(--text)">any domain or subdomain</strong>. A single organization can register multiple agents under one root domain by using subdomains — one record per agent.</p>
-
-    <div class="note"><strong>How the lookup works:</strong> AgentRoot always prepends <code>_agent.</code> to whatever domain you submit. So if your agent lives on a subdomain, submit the full subdomain — e.g. <code>radar.yourdomain.com</code>, not <code>yourdomain.com</code>.</div>
-
-    <h3>Multi-agent examples</h3>
-    <table class="field-table">
-      <tr>
-        <th>DNS Record</th>
-        <th>What to submit</th>
-        <th>Use case</th>
-      </tr>
-      <tr>
-        <td class="field-name">_agent.agentroot.io</td>
-        <td><code>agentroot.io</code></td>
-        <td>The registry itself</td>
-      </tr>
-      <tr>
-        <td class="field-name">_agent.radar.yourdomain.com</td>
-        <td><code>radar.yourdomain.com</code></td>
-        <td>A signal intelligence agent</td>
-      </tr>
-      <tr>
-        <td class="field-name">_agent.assistant.yourdomain.com</td>
-        <td><code>assistant.yourdomain.com</code></td>
-        <td>A personal assistant agent</td>
-      </tr>
-    </table>
-
-    <p>Each subdomain gets its own <code>_agent</code> TXT record and appears as a separate entry in the registry. There's no limit on how many agents an org can register this way.</p>
-
-    <h2>Record Format</h2>
-    <p>The value is a space-separated list of <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent2)">key=value</code> pairs starting with the version prefix <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent2)">v=agent1</code>.</p>
-
-    <div class="code-block" id="format-block">_agent.yourdomain.com  TXT  "v=agent1 name=AgentName caps=cap1,cap2 endpoint=https://yourdomain.com/a2a proto=a2a desc=Short\ description"<button class="copy-btn" onclick="copyCode('format-block')">Copy</button></div>
-
-    <h2>Fields</h2>
-    <table class="field-table">
-      <tr>
-        <th>Field</th>
-        <th>Required</th>
-        <th>Description</th>
-        <th>Example</th>
-      </tr>
-      <tr>
-        <td class="field-name">v</td>
-        <td><span class="required">Required</span></td>
-        <td>Version identifier. Must be <code>agent1</code> for this spec.</td>
-        <td><code>v=agent1</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">name</td>
-        <td><span class="required">Required</span></td>
-        <td>Human-readable name of the agent. No spaces — use backslash-space for multi-word.</td>
-        <td><code>name=MyAgent</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">caps</td>
-        <td><span class="required">Required</span></td>
-        <td>Comma-separated list of capabilities. Use lowercase, underscores OK. No spaces.</td>
-        <td><code>caps=search,summarize,translate</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">endpoint</td>
-        <td><span class="optional">Optional</span></td>
-        <td>URL of the agent's A2A or API endpoint. HTTPS recommended.</td>
-        <td><code>endpoint=https://yourdomain.com/a2a</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">proto</td>
-        <td><span class="optional">Optional</span></td>
-        <td>Protocol spoken by the endpoint. Defaults to <code>a2a</code>.</td>
-        <td><code>proto=a2a</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">desc</td>
-        <td><span class="optional">Optional</span></td>
-        <td>Short description. Use backslash-space for multi-word values.</td>
-        <td><code>desc=Searches\ and\ summarizes\ the\ web</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">card</td>
-        <td><span class="optional">Optional</span></td>
-        <td>URL to an agent-card.json file (A2A standard) with full agent metadata.</td>
-        <td><code>card=https://yourdomain.com/.well-known/agent-card.json</code></td>
-      </tr>
-    </table>
-
-    <div class="note"><strong>Note on multi-word values:** DNS TXT records don't support quoted sub-values. Use a backslash followed by a space (<code>\<space></code>) within a value to encode spaces. AgentRoot decodes these when indexing.</div>
-
-    <h2>Examples</h2>
-
-    <h3>Minimal (required fields only)</h3>
-    <div class="code-block" id="ex1">_agent.mybot.com  TXT  "v=agent1 name=MyBot caps=chat,search"<button class="copy-btn" onclick="copyCode('ex1')">Copy</button></div>
-
-    <h3>Full record</h3>
-    <div class="code-block" id="ex2">_agent.mybot.com  TXT  "v=agent1 name=My\ Research\ Bot caps=research,summarize,cite endpoint=https://mybot.com/a2a proto=a2a desc=Academic\ research\ assistant card=https://mybot.com/.well-known/agent-card.json"<button class="copy-btn" onclick="copyCode('ex2')">Copy</button></div>
-
-    <h3>Cloudflare DNS dashboard</h3>
-    <div class="code-block" id="ex3">Type:  TXT
-Name:  _agent
-Value: v=agent1 name=MyAgent caps=summarize,translate endpoint=https://myagent.com/a2a<button class="copy-btn" onclick="copyCode('ex3')">Copy</button></div>
-
-    <h3>Route53 / CLI</h3>
-    <div class="code-block" id="ex4">aws route53 change-resource-record-sets --hosted-zone-id YOUR_ZONE_ID \
-  --change-batch '{
-    "Changes": [{
-      "Action": "CREATE",
-      "ResourceRecordSet": {
-        "Name": "_agent.yourdomain.com",
-        "Type": "TXT",
-        "TTL": 300,
-        "ResourceRecords": [{"Value": "\"v=agent1 name=MyAgent caps=search,summarize\""}]
-      }
-    }]
-  }'<button class="copy-btn" onclick="copyCode('ex4')">Copy</button></div>
-
-    <h2>Verification</h2>
-    <p>After adding the record, verify it works:</p>
-    <div class="code-block" id="ex5">dig TXT _agent.yourdomain.com +short
-
-# or
-nslookup -type=TXT _agent.yourdomain.com<button class="copy-btn" onclick="copyCode('ex5')">Copy</button></div>
-
-    <p>Then <a href="/submit.html" style="color:var(--accent2)">submit your domain to AgentRoot. We'll do a live DNS lookup and index you immediately.</p>
-
-    <h2>How AgentRoot Uses It</h2>
-    <p>AgentRoot resolves <code>_agent.&lt;domain&gt;</code> TXT records via DNS on submission and every 6 hours thereafter. If a record disappears, the agent is marked as offline but not deleted. AgentRoot never hits your web server for discovery — DNS only.</p>
-
-    <h2>Questions / Feedback</h2>
-    <p>This spec is maintained by AgentRoot. To propose changes, open an issue or contact Clawd.</p>
-
-    <hr style="border:none;border-top:1px solid var(--border);margin:48px 0">
-
-    <!-- ─── _skill spec ─── -->
-    <h1 style="font-size:22px;margin-bottom:8px">Part 2: <code style="color:#a78bfa">_skill</code> Record</h1>
-    <p class="subtitle" style="margin-bottom:28px">
-      The <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;color:#a78bfa">_skill</code> TXT record publishes a callable tool — an MCP server, OpenAPI endpoint, GraphQL API, REST endpoint, or gRPC service. Any agent or developer can query AgentRoot to discover skills and auto-configure tool calls.
-    </p>
-
-    <h2>Overview</h2>
-    <p>Skills are <strong style="color:var(--text)">stateless callable tools</strong>, not entities. They don't have conversations — you call them with inputs and get outputs. The <code>proto</code> field tells agents how to call the skill, and <code>schema</code> points to a machine-readable definition (OpenAPI spec, MCP manifest) for automatic integration.</p>
-
-    <h2>Record Format</h2>
-    <div class="code-block" id="skill-format">_skill.yourdomain.com  TXT  "v=skill1 name=MySkill proto=mcp caps=search,query endpoint=https://yourdomain.com/mcp schema=https://yourdomain.com/mcp/manifest.json auth=apikey cost=free desc=Short\ description"<button class="copy-btn" onclick="copyCode('skill-format')">Copy</button></div>
-
-    <h2>Fields</h2>
-    <table class="field-table">
-      <tr>
-        <th>Field</th>
-        <th>Required</th>
-        <th>Description</th>
-        <th>Example</th>
-      </tr>
-      <tr>
-        <td class="field-name">v</td>
-        <td><span class="required">Required</span></td>
-        <td>Version. Must be <code>skill1</code>.</td>
-        <td><code>v=skill1</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">name</td>
-        <td><span class="required">Required</span></td>
-        <td>Human-readable name of the skill.</td>
-        <td><code>name=Stripe</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">proto</td>
-        <td><span class="required">Required</span></td>
-        <td>Protocol. See values below. This is the key field — tells agents HOW to call the skill.</td>
-        <td><code>proto=mcp</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">caps</td>
-        <td><span class="required">Required</span></td>
-        <td>Comma-separated list of callable methods or operations.</td>
-        <td><code>caps=search,trending,comments</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">endpoint</td>
-        <td><span class="optional">Optional</span></td>
-        <td>Base URL where the skill is reachable.</td>
-        <td><code>endpoint=https://mcp.reddit.com</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">schema</td>
-        <td><span class="optional">Optional</span></td>
-        <td>URL to machine-readable schema. For MCP: manifest JSON. For OpenAPI: .json/.yaml spec. Enables automatic tool integration.</td>
-        <td><code>schema=https://mcp.reddit.com/manifest.json</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">auth</td>
-        <td><span class="optional">Optional</span></td>
-        <td>Auth model. Helps agents know what credentials they need. Values: <code>none</code>, <code>apikey</code>, <code>oauth2</code>, <code>bearer</code>.</td>
-        <td><code>auth=apikey</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">cost</td>
-        <td><span class="optional">Optional</span></td>
-        <td>Pricing signal. Values: <code>free</code>, <code>freemium</code>, <code>paid</code>.</td>
-        <td><code>cost=free</code></td>
-      </tr>
-      <tr>
-        <td class="field-name">desc</td>
-        <td><span class="optional">Optional</span></td>
-        <td>Short description (≤120 chars). Use backslash-space for multi-word.</td>
-        <td><code>desc=Searches\ Reddit\ posts</code></td>
-      </tr>
-    </table>
-
-    <h2>Protocol Values</h2>
-    <table class="field-table">
-      <tr><th>Value</th><th>Protocol</th><th>Schema field should point to</th></tr>
-      <tr><td class="field-name">mcp</td><td>Model Context Protocol</td><td>MCP server manifest JSON</td></tr>
-      <tr><td class="field-name">openapi</td><td>OpenAPI / Swagger</td><td>.json or .yaml spec file</td></tr>
-      <tr><td class="field-name">graphql</td><td>GraphQL</td><td>Introspection endpoint or SDL URL</td></tr>
-      <tr><td class="field-name">rest</td><td>Generic REST</td><td>Any docs URL</td></tr>
-      <tr><td class="field-name">grpc</td><td>gRPC</td><td>.proto file URL</td></tr>
-    </table>
-
-    <div class="note"><strong>Recommendation:</strong> Always include a <code>schema</code> URL for <code>mcp</code> and <code>openapi</code> skills. This enables agents to auto-configure tool calls without human integration. Skills without a schema URL are shown in the registry but marked as requiring manual integration.</div>
-
-    <h2>Examples</h2>
-
-    <h3>MCP Server</h3>
-    <div class="code-block" id="skill-ex1">_skill.reddit.com  TXT  "v=skill1 name=Reddit proto=mcp caps=search,trending,comments endpoint=https://mcp.reddit.com schema=https://mcp.reddit.com/manifest.json auth=oauth2 cost=free"<button class="copy-btn" onclick="copyCode('skill-ex1')">Copy</button></div>
-
-    <h3>OpenAPI (REST)</h3>
-    <div class="code-block" id="skill-ex2">_skill.stripe.com  TXT  "v=skill1 name=Stripe proto=openapi caps=charge,refund,customer,subscription endpoint=https://api.stripe.com/v1 schema=https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json auth=apikey cost=paid"<button class="copy-btn" onclick="copyCode('skill-ex2')">Copy</button></div>
-
-    <h3>GraphQL</h3>
-    <div class="code-block" id="skill-ex3">_skill.github.com  TXT  "v=skill1 name=GitHub proto=graphql caps=repos,issues,prs,search endpoint=https://api.github.com/graphql schema=https://docs.github.com/public/schema.docs.graphql auth=bearer cost=freemium"<button class="copy-btn" onclick="copyCode('skill-ex3')">Copy</button></div>
-
-    <h2>A Domain Can Have Both</h2>
-    <p>A domain can publish both an <code style="color:var(--accent2)">_agent</code> and a <code style="color:#a78bfa">_skill</code> record simultaneously. AgentRoot indexes both. Example: a service might expose an autonomous agent <em>and</em> a callable API.</p>
-    <div class="code-block" id="skill-ex4">; Same domain, two records — totally valid
-_agent.yourdomain.com  TXT  "v=agent1 name=MyAgent caps=research,summarize endpoint=https://yourdomain.com/a2a"
-_skill.yourdomain.com  TXT  "v=skill1 name=MyAPI proto=openapi caps=search,summarize endpoint=https://yourdomain.com/api schema=https://yourdomain.com/openapi.json auth=apikey cost=freemium"<button class="copy-btn" onclick="copyCode('skill-ex4')">Copy</button></div>
-
+    <p style="font-size:14px; color:var(--muted)">A domain can have both. <code>_agent.example.com</code> and <code>_skill.example.com</code> are independent records.</p>
   </div>
 
-  <script>
-    function copyCode(id) {
-      const block = document.getElementById(id);
-      const text = block.textContent.replace('Copy', '').trim();
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = block.querySelector('.copy-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 2000);
-      });
-    }
-  </script>
+  <div class="content-section">
+    <div class="section-label">// _agent format</div>
+    <h2 class="section-title">Agent record</h2>
+    <div class="code-block" style="margin-bottom:24px">
+<span class="c"># DNS record</span>
+<span class="k">_agent</span>.yourdomain.com  <span class="v">IN TXT</span>  <span class="s">"v=agent1 name=MyAgent caps=search,analyze endpoint=https://yourdomain.com/api proto=rest desc=Short\ description"</span>
+    </div>
+    <table>
+      <thead><tr><th>Field</th><th>Required</th><th>Description</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>v</td><td><span class="badge badge-active">required</span></td><td>Version. Always <code>agent1</code> for this version.</td><td><code>v=agent1</code></td></tr>
+        <tr><td>name</td><td><span class="badge badge-active">required</span></td><td>Short display name. No spaces.</td><td><code>name=Radar</code></td></tr>
+        <tr><td>caps</td><td><span class="badge badge-active">required</span></td><td>Comma-separated capability list. Use lowercase, no spaces.</td><td><code>caps=search,analyze,alert</code></td></tr>
+        <tr><td>endpoint</td><td><span class="badge badge-pending">optional</span></td><td>URL where this agent can be called.</td><td><code>endpoint=https://example.com/api</code></td></tr>
+        <tr><td>proto</td><td><span class="badge badge-pending">optional</span></td><td>Protocol the agent speaks. Any value accepted.</td><td><code>proto=rest</code></td></tr>
+        <tr><td>desc</td><td><span class="badge badge-pending">optional</span></td><td>Short description. Escape spaces with <code>\ </code></td><td><code>desc=Signal\ intelligence</code></td></tr>
+        <tr><td>card</td><td><span class="badge badge-pending">optional</span></td><td>URL to a full <code>agent-card.json</code> for rich metadata.</td><td><code>card=https://example.com/.well-known/agent-card.json</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section">
+    <div class="section-label">// _skill format</div>
+    <h2 class="section-title">Skill record</h2>
+    <div class="code-block" style="margin-bottom:24px">
+<span class="c"># DNS record</span>
+<span class="k">_skill</span>.yourdomain.com  <span class="v">IN TXT</span>  <span class="s">"v=skill1 name=MyAPI proto=openapi caps=search,query endpoint=https://yourdomain.com/api schema=https://yourdomain.com/openapi.json auth=apikey cost=free"</span>
+    </div>
+    <table>
+      <thead><tr><th>Field</th><th>Required</th><th>Description</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>v</td><td><span class="badge badge-active">required</span></td><td>Version. Always <code>skill1</code>.</td><td><code>v=skill1</code></td></tr>
+        <tr><td>name</td><td><span class="badge badge-active">required</span></td><td>Short display name.</td><td><code>name=StripeAPI</code></td></tr>
+        <tr><td>proto</td><td><span class="badge badge-active">required</span></td><td>Protocol. Accepted values: <code>mcp</code>, <code>openapi</code>, <code>rest</code>, <code>graphql</code>, <code>a2a</code>, <code>grpc</code>, or any custom value.</td><td><code>proto=mcp</code></td></tr>
+        <tr><td>caps</td><td><span class="badge badge-active">required</span></td><td>Comma-separated capabilities.</td><td><code>caps=charge,refund</code></td></tr>
+        <tr><td>endpoint</td><td><span class="badge badge-pending">optional</span></td><td>URL to call this skill.</td><td><code>endpoint=https://api.example.com</code></td></tr>
+        <tr><td>schema</td><td><span class="badge badge-pending">optional</span></td><td>URL to machine-readable spec (OpenAPI JSON, MCP manifest).</td><td><code>schema=https://example.com/openapi.json</code></td></tr>
+        <tr><td>auth</td><td><span class="badge badge-pending">optional</span></td><td>Auth model. Values: <code>none</code>, <code>apikey</code>, <code>oauth2</code>, <code>bearer</code>.</td><td><code>auth=apikey</code></td></tr>
+        <tr><td>cost</td><td><span class="badge badge-pending">optional</span></td><td>Pricing model. Values: <code>free</code>, <code>paid</code>, <code>freemium</code>.</td><td><code>cost=free</code></td></tr>
+        <tr><td>desc</td><td><span class="badge badge-pending">optional</span></td><td>Short description. Escape spaces with <code>\ </code></td><td><code>desc=Payment\ processing\ API</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section">
+    <div class="section-label">// subdomains</div>
+    <h2 class="section-title">One domain, many agents</h2>
+    <p style="font-size:15px; color:var(--text2); margin-bottom:24px; max-width:560px">Use subdomains to register multiple agents or skills under one organization. Submit each subdomain separately to AgentRoot.</p>
+    <div class="code-block">
+<span class="c"># Multiple agents under one org</span>
+<span class="k">_agent</span>.example.com           <span class="v">→</span> main agent
+<span class="k">_agent</span>.radar.example.com     <span class="v">→</span> signal intelligence agent
+<span class="k">_agent</span>.assistant.example.com <span class="v">→</span> personal assistant
+
+<span class="c"># Skills alongside agents</span>
+<span class="k">_skill</span>.api.example.com       <span class="v">→</span> public API as a skill
+<span class="k">_skill</span>.search.example.com    <span class="v">→</span> search capability
+    </div>
+  </div>
+
+  <div class="content-section">
+    <div class="section-label">// examples</div>
+    <h2 class="section-title">Real-world examples</h2>
+    <div style="display:flex; flex-direction:column; gap:24px">
+      <div>
+        <div class="section-label" style="margin-bottom:8px">Signal intelligence agent</div>
+        <div class="code-block"><span class="s">"v=agent1 name=Radar caps=trend_scan,signal_score,breakthrough_alert endpoint=https://radar.example.com/api proto=rest desc=Early\ trend\ detection\ for\ AI\ crypto\ finance"</span></div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:8px">MCP skill (tool server)</div>
+        <div class="code-block"><span class="s">"v=skill1 name=GitHubSearch proto=mcp caps=repo_search,trending,code_search endpoint=https://mcp.example.com schema=https://mcp.example.com/manifest.json auth=apikey cost=free"</span></div>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:8px">OpenAPI skill</div>
+        <div class="code-block"><span class="s">"v=skill1 name=WeatherAPI proto=openapi caps=current,forecast,alerts endpoint=https://api.example.com/v1 schema=https://api.example.com/openapi.json auth=none cost=freemium"</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-left">© 2026 AgentRoot · Open Standard</div>
+  <div class="footer-right">
+    <a href="/api.html">API</a>
+    <a href="/howitworks.html">How it works</a>
+    <a href="/submit.html">Submit</a>
+  </div>
+</footer>
 </body>
 </html>

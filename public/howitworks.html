@@ -4,494 +4,190 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How It Works — AgentRoot</title>
-  <meta name="description" content="Learn how to register your AI agent on AgentRoot in 3 steps using a simple DNS TXT record. No signups, no gatekeepers — just DNS.">
-  <meta property="og:title" content="How It Works — AgentRoot">
-  <meta property="og:description" content="Register your AI agent in 3 steps using a DNS TXT record. Open, decentralized, no gatekeepers.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://agentroot.io/howitworks.html">
-  <meta property="og:site_name" content="AgentRoot">
-  <meta name="twitter:card" content="summary">
+  <meta name="description" content="Register your AI agent or skill in 3 steps using a DNS TXT record. No accounts, no gatekeepers.">
+  <link rel="canonical" href="https://agentroot.io/howitworks.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
   <style>
-    :root {
-      --bg: #0a0a0f;
-      --surface: #111118;
-      --surface2: #1a1a24;
-      --border: #2a2a3a;
-      --text: #e8e8f0;
-      --muted: #888899;
-      --accent: #6366f1;
-      --accent2: #818cf8;
-      --green: #34d399;
-      --yellow: #fbbf24;
-      --red: #f87171;
-      --code-bg: #0d0d15;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-
-    header {
-      position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px solid var(--border);
-      background: rgba(10,10,15,0.88);
-      backdrop-filter: blur(12px);
-      padding: 0 32px;
-      height: 60px;
+    .steps-big {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 0;
     }
-    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
-    .logo-mark { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), #0284c7); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
-    nav { display: flex; align-items: center; gap: 4px; }
-    nav a { color: var(--muted); text-decoration: none; font-size: 13.5px; font-weight: 500; padding: 6px 12px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
-    nav a:hover { color: var(--text); background: var(--surface2); }
-    nav a.active { color: var(--accent2); }
-    .nav-cta { background: var(--accent); color: white !important; margin-left: 8px; font-weight: 600 !important; }
-    .nav-cta:hover { background: #0284c7 !important; }
-    .hamburger { display: none; background: none; border: 1px solid var(--border); color: var(--text); padding: 7px 10px; border-radius: 7px; cursor: pointer; font-size: 16px; line-height: 1; }
-    .mobile-nav { display: none; position: fixed; top: 60px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--border); padding: 16px 20px; z-index: 99; flex-direction: column; gap: 4px; }
-    .mobile-nav.open { display: flex; }
-    .mobile-nav a { color: var(--muted); text-decoration: none; font-size: 15px; font-weight: 500; padding: 12px 0; border-bottom: 1px solid var(--border); }
-    .mobile-nav a:last-child { border-bottom: none; }
-    .mobile-nav a:hover { color: var(--text); }
-    @media (max-width: 768px) {
-      header { padding: 0 20px; }
-      nav.nav-desktop { display: none; }
-      .hamburger { display: block; }
-    }
-
-    .page { max-width: 800px; margin: 0 auto; padding: 0 24px; }
-
-    /* ── Hero ── */
-    .hero { padding: 72px 0 56px; text-align: center; }
-    .hero-eyebrow {
-      display: inline-block;
-      background: rgba(99,102,241,0.15);
-      border: 1px solid rgba(99,102,241,0.3);
-      color: var(--accent2);
-      font-size: 12px; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      padding: 4px 14px; border-radius: 20px; margin-bottom: 24px;
-    }
-    .hero h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 16px; }
-    .hero p { font-size: 18px; color: var(--muted); line-height: 1.7; max-width: 560px; margin: 0 auto; }
-
-    /* ── Steps ── */
-    .steps { display: flex; flex-direction: column; gap: 0; margin: 64px 0; position: relative; }
-    .steps::before {
-      content: '';
-      position: absolute;
-      left: 40px;
-      top: 60px;
-      bottom: 60px;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--accent), rgba(99,102,241,0.1));
-    }
-    .step {
-      display: flex;
-      gap: 32px;
-      align-items: flex-start;
-      padding: 32px 0;
-    }
-    .step-num {
-      width: 80px;
-      height: 80px;
-      flex-shrink: 0;
-      background: var(--surface);
-      border: 2px solid var(--accent);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: 900;
-      color: var(--accent2);
-      position: relative;
-      z-index: 1;
-    }
-    .step-body { flex: 1; padding-top: 16px; min-width: 0; }
-    .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent2); margin-bottom: 8px; }
-    .step-body h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
-    .step-body p { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
-    .step-body p strong { color: var(--text); }
-    .code-block {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 20px;
-      font-family: 'Fira Code', 'Cascadia Code', monospace;
-      font-size: 13px;
-      color: var(--accent2);
-      overflow-x: auto;
-      line-height: 1.6;
-      white-space: pre;
-      max-width: 100%;
-      word-break: break-all;
-    }
-    .code-comment { color: var(--muted); }
-    .badge-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .badge-check {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3);
-      color: var(--green); padding: 6px 16px; border-radius: 20px;
-      font-size: 13px; font-weight: 600;
-    }
-
-    /* ── DNS Record Builder ── */
-    .builder {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 40px;
-      margin: 48px 0 64px;
-    }
-    .builder-header { text-align: center; margin-bottom: 32px; }
-    .builder-header h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
-    .builder-header p { font-size: 15px; color: var(--muted); }
-    
-    .form-grid {
+    .step-big {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: 80px 1fr;
+      gap: 32px;
+      padding: 48px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
     }
-    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group.full { grid-column: 1 / -1; }
-    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    label span { color: var(--red); }
-    input[type="text"] {
+    .step-big:last-child { border-bottom: none; }
+    .step-big-num {
+      font-family: var(--mono);
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .step-big-content h2 {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .step-big-content p {
+      font-size: 15px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      max-width: 560px;
+    }
+    .dns-providers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .dns-provider {
+      font-family: var(--mono);
+      font-size: 12px;
       background: var(--surface2);
       border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.15s;
+      color: var(--text2);
+      padding: 4px 12px;
+      border-radius: 4px;
     }
-    input[type="text"]::placeholder { color: var(--muted); }
-    input[type="text"]:focus { border-color: var(--accent); }
-
-    .caps-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
-    .caps-hint a { color: var(--accent2); text-decoration: none; }
-
-    .output-section { margin-top: 8px; }
-    .output-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    @media (max-width: 600px) {
+      .step-big { grid-template-columns: 1fr; gap: 16px; }
+      .step-big-num { font-size: 36px; }
     }
-    .output-wrap { position: relative; }
-    .output-code {
-      background: var(--code-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 20px;
-      font-family: 'Fira Code', 'Cascadia Code', monospace;
-      font-size: 13px;
-      color: var(--accent2);
-      word-break: break-all;
-      white-space: pre-wrap;
-      min-height: 60px;
-      cursor: text;
-    }
-    .copy-btn {
-      position: absolute; top: 8px; right: 8px;
-      background: var(--surface2); border: 1px solid var(--border);
-      color: var(--muted); padding: 4px 12px; border-radius: 6px;
-      font-size: 12px; cursor: pointer; transition: all 0.15s;
-    }
-    .copy-btn:hover { border-color: var(--accent); color: var(--text); }
-    .copy-btn.copied { border-color: var(--green); color: var(--green); }
-
-    .dns-note {
-      background: rgba(99,102,241,0.08);
-      border: 1px solid rgba(99,102,241,0.2);
-      border-radius: 8px;
-      padding: 14px 18px;
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 20px;
-      line-height: 1.6;
-    }
-    .dns-note strong { color: var(--text); }
-
-    /* ── FAQ ── */
-    .faq { margin: 64px 0; }
-    .faq h2 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 32px; }
-    .faq-item {
-      border-bottom: 1px solid var(--border);
-      padding: 20px 0;
-    }
-    .faq-item h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-    .faq-item p { font-size: 14px; color: var(--muted); line-height: 1.7; }
-    .faq-item p a { color: var(--accent2); text-decoration: none; }
-    .faq-item p code {
-      background: var(--surface2); padding: 2px 6px; border-radius: 4px;
-      font-family: monospace; font-size: 12px; color: var(--accent2);
-    }
-
-    /* ── CTA ── */
-    .cta-bar {
-      text-align: center;
-      padding: 64px 0;
-      border-top: 1px solid var(--border);
-    }
-    .cta-bar h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
-    .cta-bar p { color: var(--muted); margin-bottom: 28px; font-size: 15px; }
-    .btn-primary {
-      background: var(--accent); color: white;
-      padding: 12px 28px; border-radius: 8px;
-      text-decoration: none; font-weight: 600; font-size: 15px;
-    }
-    .btn-primary:hover { background: var(--accent2); }
   </style>
 </head>
 <body>
-  <header>
-    <a class="logo" href="/">
-      <div class="logo-mark">🌐</div>
-      <span class="logo-text">AgentRoot</span>
-    </a>
-    <nav class="nav-desktop">
-      <a href="/">Registry</a>
-      <a href="/howitworks.html" class="active">How It Works</a>
-      <a href="/api.html">API Docs</a>
-      <a href="/spec.html">Spec</a>
-      <a href="/submit.html" class="nav-cta">Submit Agent</a>
-    </nav>
-    <button class="hamburger" id="hamburger-btn" aria-label="Open menu">☰</button>
-  </header>
+<header>
+  <a href="/" class="logo"><div class="logo-icon">⬡</div>AgentRoot</a>
+  <nav>
+    <a href="/">$ ls /registry</a>
+    <a href="/howitworks.html" class="active">$ man howto</a>
+    <a href="/spec.html">$ cat spec.txt</a>
+    <a href="/api.html">$ api --docs</a>
+    <a href="/submit.html" class="nav-submit">$ submit ↗</a>
+  </nav>
+  <button class="hamburger" onclick="document.querySelector('.mobile-nav').classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+<div class="mobile-nav">
+  <a href="/">$ ls /registry</a>
+  <a href="/howitworks.html">$ man howto</a>
+  <a href="/spec.html">$ cat spec.txt</a>
+  <a href="/api.html">$ api --docs</a>
+  <a href="/submit.html">$ submit ↗</a>
+</div>
 
-  <div class="mobile-nav" id="mobile-nav">
-    <a href="/">Registry</a>
-    <a href="/howitworks.html">How It Works</a>
-    <a href="/api.html">API Docs</a>
-    <a href="/spec.html">Spec</a>
-    <a href="/submit.html">Submit Agent →</a>
+<div style="border-bottom: 1px solid var(--border);">
+  <div class="page-hero">
+    <div class="page-eyebrow">Documentation</div>
+    <h1 class="page-title">$ man agentroot</h1>
+    <p class="page-subtitle">Register your agent or skill in 3 steps. No accounts. No API keys. No approval process. Just DNS.</p>
   </div>
+</div>
 
-  <div class="page">
-    <div class="hero">
-      <div class="hero-eyebrow">3 steps · No signup · DNS only</div>
-      <h1>How to register your agent</h1>
-      <p>Add one DNS TXT record to your domain. That's it. AgentRoot does the rest — discovery, indexing, and making your agent findable by anyone.</p>
-    </div>
+<div class="container">
+  <div class="content-section">
+    <div class="section-label">// registration</div>
+    <div class="steps-big">
 
-    <!-- Steps -->
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-label">Step One</div>
-          <h2>Add an <code style="font-size:20px;color:var(--accent2)">_agent</code> TXT record to your DNS</h2>
-          <p>Go to your DNS provider (Cloudflare, Route 53, Namecheap, etc.) and add a TXT record at <strong>_agent.yourdomain.com</strong>. This is the signal that says "an agent lives here."</p>
-          <div class="code-block"><span class="code-comment"># DNS Record</span>
-Host:  _agent.yourdomain.com
-Type:  TXT
-Value: v=agent1 name=MyAgent caps=search,summarize endpoint=https://yourdomain.com/a2a proto=a2a desc=What my agent does</div>
-          <p style="margin-top:16px">Use the <a href="#builder" style="color:var(--accent2)">record builder below</a> to generate your exact value.</p>
-        </div>
-      </div>
+      <div class="step-big">
+        <div class="step-big-num">01</div>
+        <div class="step-big-content">
+          <h2>Add a TXT record to your DNS</h2>
+          <p>Go to your DNS provider and add a TXT record. The record name is <code>_agent.yourdomain.com</code> (for agents) or <code>_skill.yourdomain.com</code> (for tools/skills).</p>
+          <div class="code-block">
+<span class="c"># For an agent</span>
+<span class="k">_agent</span>.yourdomain.com  <span class="v">TXT</span>  <span class="s">"v=agent1 name=MyAgent caps=search,analyze endpoint=https://yourdomain.com/api proto=rest"</span>
 
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-label">Step Two</div>
-          <h2>Submit your domain to AgentRoot</h2>
-          <p>Visit the <a href="/submit.html" style="color:var(--accent2)">submit page</a> and enter your domain. AgentRoot performs a live DNS lookup for your <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:12px">_agent</code> TXT record. If found, you're indexed immediately — no waiting, no review queue.</p>
-          <div class="code-block"><span class="code-comment"># Or submit via API</span>
-curl -X POST https://agentroot.io/api/submit \
-  -H "Content-Type: application/json" \
-  -d '{"domain": "yourdomain.com"}'</div>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-label">Step Three</div>
-          <h2>Your agent is discoverable by anyone</h2>
-          <p>Your agent gets a permanent canonical URL at <strong>agentroot.io/agents/yourdomain.com</strong>. Humans can find it by searching the registry. Other agents can discover it programmatically via <strong>GET /api/agents?caps=your-capability</strong>. No maintenance required — AgentRoot re-verifies your record every 6 hours automatically.</p>
-          <div class="badge-wrap">
-            <div class="badge-check">✓ Indexed</div>
-            <div class="badge-check">🔍 Searchable</div>
-            <div class="badge-check">🤖 Machine-readable</div>
+<span class="c"># For a skill (callable tool)</span>
+<span class="k">_skill</span>.yourdomain.com  <span class="v">TXT</span>  <span class="s">"v=skill1 name=MyAPI proto=openapi caps=search,summarize endpoint=https://yourdomain.com/api"</span>
+          </div>
+          <p style="margin-top:16px">Works with any DNS provider:</p>
+          <div class="dns-providers">
+            <span class="dns-provider">Cloudflare</span>
+            <span class="dns-provider">Route 53</span>
+            <span class="dns-provider">Namecheap</span>
+            <span class="dns-provider">Google Domains</span>
+            <span class="dns-provider">GoDaddy</span>
+            <span class="dns-provider">Porkbun</span>
+            <span class="dns-provider">Any other</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- DNS Record Builder -->
-    <div class="builder" id="builder">
-      <div class="builder-header">
-        <h2>🔧 DNS Record Builder</h2>
-        <p>Fill in your agent's details and get the exact TXT record value to copy-paste into your DNS provider.</p>
-      </div>
+      <div class="step-big">
+        <div class="step-big-num">02</div>
+        <div class="step-big-content">
+          <h2>Submit your domain</h2>
+          <p>Tell AgentRoot to look you up. We'll query <code>_agent.yourdomain.com</code> (and <code>_skill.yourdomain.com</code>) via DNS, verify the record exists, and add you to the registry. No account needed.</p>
+          <div class="code-block">
+<span class="c"># Via the web UI</span>
+<span class="p">→</span> agentroot.io/submit.html
 
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Domain <span>*</span></label>
-          <input type="text" id="b-domain" placeholder="yourdomain.com" />
-        </div>
-        <div class="form-group">
-          <label>Agent Name <span>*</span></label>
-          <input type="text" id="b-name" placeholder="MyAgent" />
-        </div>
-        <div class="form-group full">
-          <label>Capabilities <span>*</span></label>
-          <input type="text" id="b-caps" placeholder="search,summarize,analyze" />
-          <div class="caps-hint">Comma-separated. Examples: search, code, finance, data, automation, media, security, communication. <a href="/spec.html">View full taxonomy →</a></div>
-        </div>
-        <div class="form-group full">
-          <label>Endpoint URL</label>
-          <input type="text" id="b-endpoint" placeholder="https://yourdomain.com/agent" />
-        </div>
-        <div class="form-group">
-          <label>Protocol</label>
-          <input type="text" id="b-proto" placeholder="mcp, a2a, openapi, rest…" />
-        </div>
-        <div class="form-group">
-          <label>Agent Card URL</label>
-          <input type="text" id="b-card" placeholder="https://yourdomain.com/.well-known/agent-card.json" />
-        </div>
-        <div class="form-group full">
-          <label>Description</label>
-          <input type="text" id="b-desc" placeholder="Short description of what your agent does" />
+<span class="c"># Or via the API</span>
+<span class="v">curl</span> -X POST https://agentroot.io/api/submit \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"domain": "yourdomain.com"}'</span>
+          </div>
+          <p style="margin-top:16px; font-size:14px; color:var(--muted)">DNS propagation can take up to 24h, but usually resolves in minutes.</p>
         </div>
       </div>
 
-      <div class="output-section">
-        <div class="output-label">DNS TXT Record Host</div>
-        <div class="output-wrap">
-          <div class="output-code" id="out-host">_agent.yourdomain.com</div>
+      <div class="step-big">
+        <div class="step-big-num">03</div>
+        <div class="step-big-content">
+          <h2>Get discovered</h2>
+          <p>Your agent or skill is now publicly listed in the AgentRoot registry. Anyone can find it — developers browsing the UI, or other agents querying the API to build their tool set.</p>
+          <div class="code-block">
+<span class="c"># Anyone can query your agent</span>
+<span class="v">curl</span> https://agentroot.io/api/agents/yourdomain.com
+
+<span class="c"># Or discover all agents + skills at once</span>
+<span class="v">curl</span> https://agentroot.io/api/discover
+
+<span class="c"># Your agent-card is also available</span>
+<span class="v">curl</span> https://yourdomain.com/.well-known/agent-card.json
+          </div>
+          <div style="margin-top:20px">
+            <a href="/submit.html" class="btn-primary">Register now →</a>
+          </div>
         </div>
       </div>
 
-      <div class="output-section" style="margin-top:16px">
-        <div class="output-label">DNS TXT Record Value — copy this</div>
-        <div class="output-wrap">
-          <div class="output-code" id="out-value">v=agent1 name=YourAgent caps=your,caps</div>
-          <button class="copy-btn" id="copy-btn" onclick="copyRecord()">Copy</button>
-        </div>
-      </div>
-
-      <div class="dns-note">
-        <strong>💡 Tip:</strong> After adding the record, DNS propagation can take 1–15 minutes. 
-        Once propagated, submit your domain at <a href="/submit.html" style="color:var(--accent2)">/submit</a> and you'll be live instantly.
-        AgentRoot re-verifies all agents every 6 hours to track liveness.
-      </div>
-    </div>
-
-    <!-- FAQ -->
-    <div class="faq">
-      <h2>Frequently asked questions</h2>
-
-      <div class="faq-item">
-        <h3>Why DNS? Why not just a form submission?</h3>
-        <p>DNS is the internet's source of truth for domain ownership. By requiring a <code>_agent</code> TXT record, we ensure only real domain owners can list agents. No spam, no squatting, no impersonation. It also means you control your own data — update your DNS record and your registry entry updates automatically on the next verification cycle.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>What if I don't have an A2A endpoint yet?</h3>
-        <p>You can still register! Just omit the <code>endpoint</code> field. Your agent will appear in the registry with its capabilities listed. Add the endpoint later and it'll be picked up on the next verification cycle.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>What does AgentRoot do with my data?</h3>
-        <p>Everything in the registry is public by design. The <code>_agent</code> TXT record is already public on DNS — we just index it and make it searchable. If you remove your TXT record, your status will change to "failed" on the next verification cycle.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>What are the right values for <code>caps=</code>?</h3>
-        <p>Capabilities are free-form but we recommend using the canonical taxonomy for best discoverability: <code>research</code>, <code>finance</code>, <code>devtools</code>, <code>data</code>, <code>communication</code>, <code>automation</code>, <code>media</code>, <code>security</code>. More specific sub-caps like <code>search</code>, <code>summarize</code>, or <code>github</code> are encouraged too. <a href="/spec.html">See full spec →</a></p>
-      </div>
-
-      <div class="faq-item">
-        <h3>Can I register multiple agents on the same domain?</h3>
-        <p>Currently one <code>_agent</code> TXT record per domain. For multiple agents, use subdomains: <code>agent1.yourdomain.com</code>, <code>agent2.yourdomain.com</code>, each with their own <code>_agent</code> TXT record.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>Is there a cost?</h3>
-        <p>AgentRoot is free and open. No API keys, no rate limits (yet), no paywalls. We're building the infrastructure layer for the agentic internet — gatekeepers would defeat the purpose.</p>
-      </div>
-    </div>
-
-    <!-- CTA -->
-    <div class="cta-bar">
-      <h2>Ready to register?</h2>
-      <p>Add your <code style="background:var(--surface2);padding:2px 8px;border-radius:4px;font-family:monospace">_agent</code> TXT record, then submit your domain.</p>
-      <a class="btn-primary" href="/submit.html">Register Your Agent →</a>
     </div>
   </div>
 
-  <script>
-    const fields = {
-      domain: document.getElementById('b-domain'),
-      name: document.getElementById('b-name'),
-      caps: document.getElementById('b-caps'),
-      endpoint: document.getElementById('b-endpoint'),
-      proto: document.getElementById('b-proto'),
-      card: document.getElementById('b-card'),
-      desc: document.getElementById('b-desc')
-    };
+  <div class="content-section">
+    <div class="section-label">// subdomains</div>
+    <h2 class="section-title">Multiple agents per domain</h2>
+    <p style="font-size:15px; color:var(--text2); margin-bottom:24px; max-width:560px">A single organization can register multiple agents and skills using subdomains. Submit each subdomain separately.</p>
+    <div class="code-block">
+<span class="c"># Register each subdomain separately</span>
+<span class="k">_agent</span>.agentroot.io          <span class="v">→</span> AgentRoot (the registry itself)
+<span class="k">_agent</span>.radar.yourdomain.com  <span class="v">→</span> Radar (signal intelligence agent)
+<span class="k">_skill</span>.api.yourdomain.com    <span class="v">→</span> your public API as a skill
+    </div>
+  </div>
+</div>
 
-    function buildRecord() {
-      const domain = fields.domain.value.trim() || 'yourdomain.com';
-      const name = fields.name.value.trim();
-      const caps = fields.caps.value.trim();
-      const endpoint = fields.endpoint.value.trim();
-      const proto = fields.proto.value.trim() || 'a2a';
-      const card = fields.card.value.trim();
-      const desc = fields.desc.value.trim();
-
-      document.getElementById('out-host').textContent = `_agent.${domain}`;
-
-      let parts = ['v=agent1'];
-      if (name) parts.push(`name=${name.replace(/ /g, '\\ ')}`);
-      if (caps) parts.push(`caps=${caps.replace(/ /g, '')}`);
-      if (endpoint) parts.push(`endpoint=${endpoint}`);
-      if (proto) parts.push(`proto=${proto}`);
-      if (card) parts.push(`card=${card}`);
-      if (desc) parts.push(`desc=${desc.replace(/ /g, '\\ ')}`);
-
-      document.getElementById('out-value').textContent = parts.join(' ');
-      
-      // Reset copy button
-      const btn = document.getElementById('copy-btn');
-      btn.textContent = 'Copy';
-      btn.className = 'copy-btn';
-    }
-
-    Object.values(fields).forEach(el => el.addEventListener('input', buildRecord));
-
-    // Hamburger menu
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const mobileNav = document.getElementById('mobile-nav');
-    if (hamburgerBtn) {
-      hamburgerBtn.addEventListener('click', () => {
-        mobileNav.classList.toggle('open');
-        hamburgerBtn.textContent = mobileNav.classList.contains('open') ? '✕' : '☰';
-      });
-    }
-
-    function copyRecord() {
-      const text = document.getElementById('out-value').textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.getElementById('copy-btn');
-        btn.textContent = 'Copied!';
-        btn.className = 'copy-btn copied';
-        setTimeout(() => {
-          btn.textContent = 'Copy';
-          btn.className = 'copy-btn';
-        }, 2000);
-      });
-    }
-  </script>
+<footer>
+  <div class="footer-left">© 2026 AgentRoot</div>
+  <div class="footer-right">
+    <a href="/spec.html">Spec</a>
+    <a href="/api.html">API</a>
+    <a href="/submit.html">Submit</a>
+  </div>
+</footer>
 </body>
 </html>
